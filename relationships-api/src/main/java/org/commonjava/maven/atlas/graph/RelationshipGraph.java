@@ -15,21 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph;
 
-import static org.apache.commons.lang.StringUtils.join;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
 import org.commonjava.maven.atlas.graph.model.EProjectCycle;
 import org.commonjava.maven.atlas.graph.model.EProjectDirectRelationships;
@@ -44,8 +29,16 @@ import org.commonjava.maven.atlas.graph.traverse.RelationshipGraphTraversal;
 import org.commonjava.maven.atlas.graph.traverse.TraversalType;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
+
+import static org.apache.commons.lang.StringUtils.join;
 
 public final class RelationshipGraph
         implements Closeable

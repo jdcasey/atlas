@@ -15,14 +15,15 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Collection;
-
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.version.SingleVersion;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collection;
 
 public final class ExtensionRelationship
     extends AbstractProjectRelationship<ProjectVersionRef>
@@ -64,7 +65,7 @@ public final class ExtensionRelationship
     @Override
     public ArtifactRef getTargetArtifact()
     {
-        return new ArtifactRef( getTarget(), null, null, false );
+        return new SimpleArtifactRef( getTarget(), null, null, false );
     }
 
     @Override

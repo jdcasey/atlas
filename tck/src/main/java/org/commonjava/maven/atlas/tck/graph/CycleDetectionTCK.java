@@ -31,8 +31,9 @@ import org.commonjava.maven.atlas.graph.model.EProjectCycle;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.junit.Test;
 
 public abstract class CycleDetectionTCK
@@ -46,17 +47,17 @@ public abstract class CycleDetectionTCK
     {
         final URI source = sourceURI();
 
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef dep = new ProjectVersionRef( "org.other", "dep", "1.0" );
-        final ProjectVersionRef dep2 = new ProjectVersionRef( "org.other", "dep2", "1.0" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef dep = new SimpleProjectVersionRef( "org.other", "dep", "1.0" );
+        final ProjectVersionRef dep2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0" );
 
         final RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
-        graph.storeRelationships( new DependencyRelationship( source, project, new ArtifactRef( dep, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, dep,  new ArtifactRef( dep2,  null, null, false ), null, 0, false ) );
+        graph.storeRelationships( new DependencyRelationship( source, project, new SimpleArtifactRef( dep, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, dep,  new SimpleArtifactRef( dep2,  null, null, false ), null, 0, false ) );
         
-        final boolean introduces = graph.introducesCycle( new DependencyRelationship( source, dep,  new ArtifactRef( project,  null, null, false ), null, 0, false ) );
+        final boolean introduces = graph.introducesCycle( new DependencyRelationship( source, dep,  new SimpleArtifactRef( project,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         assertThat( introduces, equalTo( true ) );
@@ -69,9 +70,9 @@ public abstract class CycleDetectionTCK
     {
         final URI source = sourceURI();
 
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef dep = new ProjectVersionRef( "org.other", "dep", "1.0" );
-        final ProjectVersionRef dep2 = new ProjectVersionRef( "org.other", "dep2", "1.0" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef dep = new SimpleProjectVersionRef( "org.other", "dep", "1.0" );
+        final ProjectVersionRef dep2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0" );
 
         final RelationshipGraph graph = simpleGraph( project );
 
@@ -103,17 +104,17 @@ public abstract class CycleDetectionTCK
     {
         final URI source = sourceURI();
 
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef dep = new ProjectVersionRef( "org.other", "dep", "1.0" );
-        final ProjectVersionRef dep2 = new ProjectVersionRef( "org.other", "dep2", "1.0" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef dep = new SimpleProjectVersionRef( "org.other", "dep", "1.0" );
+        final ProjectVersionRef dep2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0" );
 
         final RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
         final Set<ProjectRelationship<?>> rejected = graph.storeRelationships( 
-                                         new DependencyRelationship( source, project, new ArtifactRef( dep, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, dep,  new ArtifactRef( dep2,  null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, dep2,  new ArtifactRef( dep,  null, null, false ), null, 0, false ) );
+                                         new DependencyRelationship( source, project, new SimpleArtifactRef( dep, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, dep,  new SimpleArtifactRef( dep2,  null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, dep2,  new SimpleArtifactRef( dep,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         assertThat( rejected, notNullValue() );
@@ -147,23 +148,23 @@ public abstract class CycleDetectionTCK
     {
         final URI source = sourceURI();
 
-        final ProjectVersionRef a = new ProjectVersionRef( "project", "A", "1.0" );
-        final ProjectVersionRef b = new ProjectVersionRef( "project", "B", "1.0" );
-        final ProjectVersionRef c = new ProjectVersionRef( "project", "C", "1.0" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "project", "A", "1.0" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "project", "B", "1.0" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "project", "C", "1.0" );
 
-        final ProjectVersionRef d = new ProjectVersionRef( "project", "D", "1.0" );
-        final ProjectVersionRef e = new ProjectVersionRef( "project", "E", "1.0" );
+        final ProjectVersionRef d = new SimpleProjectVersionRef( "project", "D", "1.0" );
+        final ProjectVersionRef e = new SimpleProjectVersionRef( "project", "E", "1.0" );
 
         final RelationshipGraph graph = simpleGraph( a );
 
         /* @formatter:off */
         // a --> b --> c --> a
         // d --> e --> c --> a --> b --> c
-        graph.storeRelationships( new DependencyRelationship( source, a, new ArtifactRef( b, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, b,  new ArtifactRef( c,  null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, c,  new ArtifactRef( a,  null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, d, new ArtifactRef( e, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, e,  new ArtifactRef( c,  null, null, false ), null, 0, false ) );
+        graph.storeRelationships( new DependencyRelationship( source, a, new SimpleArtifactRef( b, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, b,  new SimpleArtifactRef( c,  null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, c,  new SimpleArtifactRef( a,  null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, d, new SimpleArtifactRef( e, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, e,  new SimpleArtifactRef( c,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         final RelationshipGraph graph2 =
@@ -206,23 +207,23 @@ public abstract class CycleDetectionTCK
     {
         final URI source = sourceURI();
 
-        final ProjectVersionRef a = new ProjectVersionRef( "project", "A", "1.0" );
-        final ProjectVersionRef b = new ProjectVersionRef( "project", "B", "1.0" );
-        final ProjectVersionRef c = new ProjectVersionRef( "project", "C", "1.0" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "project", "A", "1.0" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "project", "B", "1.0" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "project", "C", "1.0" );
 
-        final ProjectVersionRef d = new ProjectVersionRef( "project", "D", "1.0" );
-        final ProjectVersionRef e = new ProjectVersionRef( "project", "E", "1.0" );
+        final ProjectVersionRef d = new SimpleProjectVersionRef( "project", "D", "1.0" );
+        final ProjectVersionRef e = new SimpleProjectVersionRef( "project", "E", "1.0" );
 
         final RelationshipGraph graph = simpleGraph( a );
 
         /* @formatter:off */
         // a --> b --> c --> a
         // d --> e --> c --> a --> b --> c
-        graph.storeRelationships( new DependencyRelationship( source, a, new ArtifactRef( b, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, c,  new ArtifactRef( a,  null, null, false ), null, 0, false ),
+        graph.storeRelationships( new DependencyRelationship( source, a, new SimpleArtifactRef( b, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, c,  new SimpleArtifactRef( a,  null, null, false ), null, 0, false ),
                                          new PluginRelationship( source, b,  c, 0, false ),
-                                         new DependencyRelationship( source, d, new ArtifactRef( e, null, null, false ), null, 0, false ),
-                                         new DependencyRelationship( source, e, new ArtifactRef( c,  null, null, false ), null, 0, false ) );
+                                         new DependencyRelationship( source, d, new SimpleArtifactRef( e, null, null, false ), null, 0, false ),
+                                         new DependencyRelationship( source, e, new SimpleArtifactRef( c,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         final RelationshipGraph graph2 =

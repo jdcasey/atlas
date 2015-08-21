@@ -133,16 +133,10 @@ public interface RelationshipGraphConnection
 
     Set<ProjectVersionRef> getProjectsWithMetadata( ViewParams params, String key );
 
-    /**
-     * @deprecated Use {@link #getDirectRelationshipsFrom(GraphView,ProjectVersionRef,boolean,boolean,RelationshipType...)} instead
-     */
     @Deprecated
     Set<ProjectRelationship<?>> getDirectRelationshipsFrom( ViewParams params, ProjectVersionRef from,
                                                             boolean includeManagedInfo, RelationshipType... types );
 
-    /**
-     * @deprecated Use {@link #getDirectRelationshipsTo(GraphView,ProjectVersionRef,boolean,boolean,RelationshipType...)} instead
-     */
     @Deprecated
     Set<ProjectRelationship<?>> getDirectRelationshipsTo( ViewParams params, ProjectVersionRef to,
                                                           boolean includeManagedInfo, RelationshipType... types );

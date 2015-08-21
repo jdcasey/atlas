@@ -19,22 +19,15 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.ref.VersionlessArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -69,8 +62,8 @@ public class ProjectVersionRefSerializerModule
         addKeyDeserializer( ProjectVersionRef.class,
                             new ProjectRefKeyDeserializer<ProjectVersionRef>( ProjectVersionRef.class ) );
 
-        logger.debug( "Registering ArtifactRef serializer/deserialer" );
-        // ArtifactRef
+        logger.debug( "Registering SimpleArtifactRef serializer/deserialer" );
+        // SimpleArtifactRef
         addSerializer( ArtifactRef.class, new ProjectRefSerializer<ArtifactRef>( ArtifactRef.class, false ) );
         addKeySerializer( ArtifactRef.class, new ProjectRefSerializer<ArtifactRef>( ArtifactRef.class, true ) );
 
@@ -105,9 +98,32 @@ public class ProjectVersionRefSerializerModule
     private <T extends ProjectRef> T parse( final String value, final Class<T> type )
                     throws IOException
     {
+        Class<?> realType = null;
+        if ( ProjectRef.class.equals( type ) )
+        {
+            realType = SimpleProjectRef.class;
+        }
+        else if ( ProjectVersionRef.class.equals( type ) )
+        {
+            realType = SimpleProjectVersionRef.class;
+        }
+        else if ( ArtifactRef.class.equals( type ) )
+        {
+            realType = SimpleArtifactRef.class;
+        }
+        else if ( VersionlessArtifactRef.class.equals( type ) )
+        {
+            realType = SimpleVersionlessArtifactRef.class;
+        }
+
+        if ( realType == null )
+        {
+            throw new IOException( "Cannot find concrete class for type: " + type.getSimpleName() );
+        }
+
         try
         {
-            final Method parseMethod = type.getMethod( "parse", String.class );
+            final Method parseMethod = realType.getMethod( "parse", String.class );
             return type.cast( parseMethod.invoke( null, value ) );
         }
         catch ( final NoSuchMethodException e )

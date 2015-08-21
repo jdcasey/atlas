@@ -50,9 +50,7 @@ import org.commonjava.maven.atlas.graph.spi.neo4j.GraphRelType;
 import org.commonjava.maven.atlas.graph.spi.neo4j.NodeType;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.CyclePath;
 import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.*;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
@@ -302,7 +300,7 @@ public final class Conversions
             throw new IllegalArgumentException( String.format( "GAV cannot contain nulls: %s:%s:%s", g, a, v ) );
         }
 
-        final ProjectVersionRef result = new ProjectVersionRef( g, a, v );
+        final ProjectVersionRef result = new SimpleProjectVersionRef( g, a, v );
         if ( cache != null )
         {
             cache.cache( node, result );
@@ -464,7 +462,7 @@ public final class Conversions
                         }
                         else
                         {
-                            excludes.add( new ProjectRef( parts[0], parts[1] ) );
+                            excludes.add( new SimpleProjectRef( parts[0], parts[1] ) );
                         }
                     }
                 }
@@ -482,7 +480,7 @@ public final class Conversions
                 final boolean managed = getBooleanProperty( IS_MANAGED, rel );
 
                 result =
-                    new PluginDependencyRelationship( source, pomLocation, from, new ProjectRef( pg, pa ), artifact,
+                    new PluginDependencyRelationship( source, pomLocation, from, new SimpleProjectRef( pg, pa ), artifact,
                                                       index, managed );
                 break;
             }
@@ -541,7 +539,7 @@ public final class Conversions
         final String classifier = getStringProperty( CLASSIFIER, rel );
         final boolean optional = getBooleanProperty( OPTIONAL, rel );
 
-        return new ArtifactRef( ref, type, classifier, optional );
+        return new SimpleArtifactRef( ref, type, classifier, optional );
     }
 
     private static void toRelationshipProperties( final ArtifactRef target, final Relationship relationship )

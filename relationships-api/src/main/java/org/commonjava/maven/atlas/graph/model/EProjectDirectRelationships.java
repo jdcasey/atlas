@@ -38,9 +38,10 @@ import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 
 public class EProjectDirectRelationships
     implements EProjectRelationshipCollection, Serializable
@@ -472,7 +473,7 @@ public class EProjectDirectRelationships
         public Builder withDependency( final ProjectVersionRef ref, final String type, final String classifier, final DependencyScope scope,
                                        final boolean managed )
         {
-            withDependencies( new DependencyRelationship( source, ref, new ArtifactRef( ref, type, classifier, false ),
+            withDependencies( new DependencyRelationship( source, ref, new SimpleArtifactRef( ref, type, classifier, false ),
                                                           scope,
                                                           getNextDependencyIndex( managed ), managed ) );
 

@@ -26,8 +26,8 @@ public class ProjectRefTest
     @Test
     public void matchesTotalWildcardGroupId()
     {
-        final ProjectRef pattern = new ProjectRef( "*", "foo" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "*", "foo" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }
@@ -35,8 +35,8 @@ public class ProjectRefTest
     @Test
     public void matchesTotalWildcardArtifactId()
     {
-        final ProjectRef pattern = new ProjectRef( "org.bar", "*" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "org.bar", "*" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }
@@ -44,8 +44,8 @@ public class ProjectRefTest
     @Test
     public void matchesTerminatingWildcardGroupId()
     {
-        final ProjectRef pattern = new ProjectRef( "org.*", "foo" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "org.*", "foo" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }
@@ -53,8 +53,8 @@ public class ProjectRefTest
     @Test
     public void matchesTerminatingWildcardArtifactId()
     {
-        final ProjectRef pattern = new ProjectRef( "org.bar", "fo*" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "org.bar", "fo*" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }
@@ -62,8 +62,8 @@ public class ProjectRefTest
     @Test
     public void matchesEmbeddedWildcardGroupId()
     {
-        final ProjectRef pattern = new ProjectRef( "org.*r", "foo" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "org.*r", "foo" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }
@@ -71,8 +71,8 @@ public class ProjectRefTest
     @Test
     public void matchesEmbeddedWildcardArtifactId()
     {
-        final ProjectRef pattern = new ProjectRef( "org.bar", "f*o" );
-        final ProjectRef test = new ProjectRef( "org.bar", "foo" );
+        final ProjectRef pattern = new SimpleProjectRef( "org.bar", "f*o" );
+        final ProjectRef test = new SimpleProjectRef( "org.bar", "foo" );
 
         assertThat( pattern.matches( test ), equalTo( true ) );
     }

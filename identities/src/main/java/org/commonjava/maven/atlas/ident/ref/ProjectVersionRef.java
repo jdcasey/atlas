@@ -1,330 +1,70 @@
-/**
- * Copyright (C) 2012 Red Hat, Inc. (jdcasey@commonjava.org)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.commonjava.maven.atlas.ident.ref;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-
-import java.io.Serializable;
-
-import org.commonjava.maven.atlas.ident.util.VersionUtils;
-import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.commonjava.maven.atlas.ident.version.SingleVersion;
 import org.commonjava.maven.atlas.ident.version.VersionSpec;
 
+import java.io.Serializable;
+
 /**
- * Reference to a particular release of a project (or module, in terms of Maven builds). A release may contain many artifacts (see {@link ArtifactRef}).
- * 
- * @see {@link ProjectRef}
- * @see {@link ArtifactRef}
- * 
- * @author jdcasey
+ * Created by jdcasey on 8/21/15.
  */
-public class ProjectVersionRef
-    extends ProjectRef
-    implements VersionedRef<ProjectVersionRef>, Serializable
+public interface ProjectVersionRef
+        extends ProjectRef, VersionedRef<ProjectVersionRef>,Serializable
 {
+    ProjectVersionRef asProjectVersionRef();
 
-    private static final long serialVersionUID = 1L;
+    ArtifactRef asPomArtifact();
 
-    // NEVER null
-    private VersionSpec versionSpec;
+    ArtifactRef asJarArtifact();
 
-    private String versionString;
+    ArtifactRef asArtifactRef( String type, String classifier );
 
-    public ProjectVersionRef( final ProjectRef ref, final VersionSpec versionSpec )
-    {
-        this( ref.getGroupId(), ref.getArtifactId(), versionSpec, null );
-    }
+    ArtifactRef asArtifactRef( String type, String classifier, boolean optional );
 
-    public ProjectVersionRef( final ProjectRef ref, final String versionSpec )
-        throws InvalidVersionSpecificationException
-    {
-        this( ref.getGroupId(), ref.getArtifactId(), versionSpec );
-    }
+    ArtifactRef asArtifactRef( TypeAndClassifier tc );
 
-    ProjectVersionRef( final String groupId, final String artifactId, final VersionSpec versionSpec,
-                       final String versionString )
-    {
-        super( groupId, artifactId );
-        if ( versionSpec == null && versionString == null )
-        {
-            throw new InvalidRefException( "Version spec AND string cannot both be null for '" + groupId + ":"
-                + artifactId + "'" );
-        }
+    ArtifactRef asArtifactRef( TypeAndClassifier tc, boolean optional );
 
-        this.versionString = versionString;
-        this.versionSpec = versionSpec;
-    }
+    VersionSpec getVersionSpecRaw();
 
-    public ProjectVersionRef( final String groupId, final String artifactId, final VersionSpec versionSpec )
-    {
-        this( groupId, artifactId, versionSpec, null );
-    }
-
-    public ProjectVersionRef( final String groupId, final String artifactId, final String versionString )
-        throws InvalidVersionSpecificationException
-    {
-        this( groupId, artifactId, null, versionString );
-    }
-
-    public static ProjectVersionRef parse( final String gav )
-    {
-        final String[] parts = gav.split( ":" );
-        if ( parts.length < 3 || isEmpty( parts[0] ) || isEmpty( parts[1] ) || isEmpty( parts[2] ) )
-        {
-            throw new InvalidRefException(
-                                           "ProjectVersionRef must contain non-empty groupId, artifactId, AND version. (Given: '"
-                                               + gav + "')" );
-        }
-
-        return new ProjectVersionRef( parts[0], parts[1], parts[2] );
-    }
-
-    public ProjectVersionRef asProjectVersionRef()
-    {
-        return ProjectVersionRef.class.equals( getClass() ) ? this : new ProjectVersionRef( getGroupId(),
-                                                                                            getArtifactId(),
-                                                                                            getVersionSpecRaw(),
-                                                                                            getVersionStringRaw() );
-    }
-
-    public ArtifactRef asPomArtifact()
-    {
-        return asArtifactRef( "pom", null, false );
-    }
-
-    public ArtifactRef asJarArtifact()
-    {
-        return asArtifactRef( "jar", null, false );
-    }
-
-    public ArtifactRef asArtifactRef( final String type, final String classifier )
-    {
-        return asArtifactRef( type, classifier, false );
-    }
-
-    public ArtifactRef asArtifactRef( final String type, final String classifier, final boolean optional )
-    {
-        return new ArtifactRef( this, type, classifier, optional );
-    }
-
-    public ArtifactRef asArtifactRef( final TypeAndClassifier tc )
-    {
-        return asArtifactRef( tc, false );
-    }
-
-    public ArtifactRef asArtifactRef( final TypeAndClassifier tc, final boolean optional )
-    {
-        return new ArtifactRef( this, tc, optional );
-    }
-
-    VersionSpec getVersionSpecRaw()
-    {
-        return versionSpec;
-    }
-
-    String getVersionStringRaw()
-    {
-        return versionString;
-    }
+    String getVersionStringRaw();
 
     @Override
-    public boolean isRelease()
-    {
-        return getVersionSpec().isRelease();
-    }
+    boolean isRelease();
 
     @Override
-    public boolean isSpecificVersion()
-    {
-        return getVersionSpec().isSingle();
-    }
+    boolean isSpecificVersion();
 
     @Override
-    public boolean matchesVersion( final SingleVersion version )
-    {
-        return getVersionSpec().contains( version );
-    }
+    boolean matchesVersion( SingleVersion version );
 
     @Override
-    public ProjectVersionRef selectVersion( final String version )
-    {
-        final SingleVersion single = VersionUtils.createSingleVersion( version );
-        return selectVersion( single, false );
-    }
+    ProjectVersionRef selectVersion( String version );
 
     @Override
-    public ProjectVersionRef selectVersion( final String version, final boolean force )
-    {
-        final SingleVersion single = VersionUtils.createSingleVersion( version );
-        return selectVersion( single, force );
-    }
+    ProjectVersionRef selectVersion( String version, boolean force );
 
     @Override
-    public ProjectVersionRef selectVersion( final SingleVersion version )
-    {
-        return selectVersion( version, false );
-    }
+    ProjectVersionRef selectVersion( SingleVersion version );
 
     @Override
-    public ProjectVersionRef selectVersion( final SingleVersion version, final boolean force )
-    {
-        final VersionSpec versionSpec = getVersionSpec();
-        if ( versionSpec.equals( version ) )
-        {
-            return this;
-        }
+    ProjectVersionRef selectVersion( SingleVersion version, boolean force );
 
-        if ( !force && !versionSpec.contains( version ) )
-        {
-            throw new IllegalArgumentException( "Specified version: " + version.renderStandard()
-                + " is not contained in spec: " + versionSpec.renderStandard() );
-        }
-
-        return newRef( getGroupId(), getArtifactId(), version );
-    }
-
-    protected ProjectVersionRef newRef( final String groupId, final String artifactId, final SingleVersion version )
-    {
-        return new ProjectVersionRef( groupId, artifactId, version );
-    }
+    ProjectVersionRef newRef( String groupId, String artifactId, SingleVersion version );
 
     @Override
-    public VersionSpec getVersionSpec()
-    {
-        if ( versionSpec == null )
-        {
-            versionSpec = VersionUtils.createFromSpec( versionString );
-        }
-        return versionSpec;
-    }
+    VersionSpec getVersionSpec();
+
+    boolean versionlessEquals( ProjectVersionRef other );
 
     @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ( ( getVersionString() == null ) ? 0 : getVersionString().hashCode() );
-        return result;
-    }
-
-    public boolean versionlessEquals( final ProjectVersionRef other )
-    {
-        if ( this == other )
-        {
-            return true;
-        }
-
-        return super.equals( other );
-    }
+    boolean isCompound();
 
     @Override
-    public boolean equals( final Object obj )
-    {
-        if ( this == obj )
-        {
-            return true;
-        }
-        if ( !super.equals( obj ) )
-        {
-            return false;
-        }
-        if ( getClass() != obj.getClass() )
-        {
-            return false;
-        }
-        final ProjectVersionRef other = (ProjectVersionRef) obj;
-        boolean result = true;
-        try
-        {
-            if ( getVersionSpec() == null )
-            {
-                if ( other.getVersionSpec() != null )
-                {
-                    result = false;
-                }
-            }
-            else if ( !getVersionSpec().equals( other.getVersionSpec() ) )
-            {
-                result = false;
-            }
-        }
-        catch ( final InvalidVersionSpecificationException e )
-        {
-            if ( getVersionString() == null )
-            {
-                if ( other.getVersionString() != null )
-                {
-                    result = false;
-                }
-            }
-            else if ( !getVersionString().equals( other.getVersionString() ) )
-            {
-                result = false;
-            }
-        }
-
-        return result;
-    }
+    boolean isSnapshot();
 
     @Override
-    public String toString()
-    {
-        return String.format( "%s:%s:%s", getGroupId(), getArtifactId(), getVersionString() );
-    }
+    String getVersionString();
 
-    @Override
-    public boolean isCompound()
-    {
-        return !getVersionSpec().isSingle();
-    }
-
-    @Override
-    public boolean isSnapshot()
-    {
-        return getVersionSpec().isSnapshot();
-    }
-
-    @Override
-    public String getVersionString()
-    {
-        if ( versionString == null )
-        {
-            versionString = versionSpec.renderStandard();
-        }
-
-        return versionString;
-    }
-
-    public boolean isVariableVersion()
-    {
-        return isCompound() || ( isSpecificVersion() && ( (SingleVersion) getVersionSpec() ).isLocalSnapshot() );
-    }
-
-    @Override
-    public int compareTo( final ProjectRef o )
-    {
-        int comp = super.compareTo( o );
-        if ( comp == 0 && ( o instanceof ProjectVersionRef ) )
-        {
-            final ProjectVersionRef or = (ProjectVersionRef) o;
-            comp = getVersionString().compareTo( or.getVersionString() );
-        }
-
-        return comp;
-    }
-
+    boolean isVariableVersion();
 }

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class ProjectVersionRefSerializerModuleTest
     public void projectRefRoundTrip()
         throws Exception
     {
-        final ProjectRef pr = new ProjectRef( "org.foo", "bar" );
+        final ProjectRef pr = new SimpleProjectRef( "org.foo", "bar" );
         final String json = mapper.writeValueAsString( pr );
 
         final ProjectRef result = mapper.readValue( json, ProjectRef.class );
@@ -56,7 +57,7 @@ public class ProjectVersionRefSerializerModuleTest
     public void mapWithProjectRefKeyRoundTrip()
         throws Exception
     {
-        final ProjectRef pr = new ProjectRef( "org.foo", "bar" );
+        final ProjectRef pr = new SimpleProjectRef( "org.foo", "bar" );
         final String value = "this is the value";
 
         final Map<ProjectRef, String> map = new HashMap<ProjectRef, String>();

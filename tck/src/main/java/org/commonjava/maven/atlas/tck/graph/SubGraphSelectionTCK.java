@@ -25,8 +25,9 @@ import java.util.Set;
 import org.commonjava.maven.atlas.graph.RelationshipGraph;
 import org.commonjava.maven.atlas.graph.ViewParams;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.junit.Test;
 
 public abstract class SubGraphSelectionTCK
@@ -38,17 +39,17 @@ public abstract class SubGraphSelectionTCK
     public void selectVersionForVariableSubgraph()
         throws Exception
     {
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef varDep = new ProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
-        final ProjectVersionRef varD2 = new ProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
-        final ProjectVersionRef selected = new ProjectVersionRef( varDep, "1.0-20130314.161200-1" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef varDep = new SimpleProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
+        final ProjectVersionRef varD2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
+        final ProjectVersionRef selected = new SimpleProjectVersionRef( varDep, "1.0-20130314.161200-1" );
 
         final URI source = sourceURI();
         final RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
-        graph.storeRelationships( new DependencyRelationship( source, project, new ArtifactRef( varDep, null, null, false ), null, 0, false ),
-                                  new DependencyRelationship( source, varDep,  new ArtifactRef( varD2,  null, null, false ), null, 0, false ) );
+        graph.storeRelationships( new DependencyRelationship( source, project, new SimpleArtifactRef( varDep, null, null, false ), null, 0, false ),
+                                  new DependencyRelationship( source, varDep,  new SimpleArtifactRef( varD2,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         Set<ProjectVersionRef> variables = graph.getVariableSubgraphs();
@@ -77,17 +78,17 @@ public abstract class SubGraphSelectionTCK
     public void selectVersionForVariableSubgraph_SelectionsContextualToView()
         throws Exception
     {
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef varDep = new ProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
-        final ProjectVersionRef varD2 = new ProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
-        final ProjectVersionRef selected = new ProjectVersionRef( varDep, "1.0-20130314.161200-1" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef varDep = new SimpleProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
+        final ProjectVersionRef varD2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
+        final ProjectVersionRef selected = new SimpleProjectVersionRef( varDep, "1.0-20130314.161200-1" );
 
         final URI source = sourceURI();
         final RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
-        graph.storeRelationships( new DependencyRelationship( source, project, new ArtifactRef( varDep, null, null, false ), null, 0, false ),
-                                  new DependencyRelationship( source, varDep,  new ArtifactRef( varD2,  null, null, false ), null, 0, false ) );
+        graph.storeRelationships( new DependencyRelationship( source, project, new SimpleArtifactRef( varDep, null, null, false ), null, 0, false ),
+                                  new DependencyRelationship( source, varDep,  new SimpleArtifactRef( varD2,  null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         Set<ProjectVersionRef> variables = graph.getVariableSubgraphs();

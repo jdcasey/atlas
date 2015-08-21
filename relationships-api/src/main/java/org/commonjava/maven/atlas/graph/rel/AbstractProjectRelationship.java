@@ -15,20 +15,16 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
+import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
 
 public abstract class AbstractProjectRelationship<T extends ProjectVersionRef>
     implements ProjectRelationship<T>, Serializable

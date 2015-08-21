@@ -15,11 +15,12 @@
  */
 package org.commonjava.maven.atlas.ident.util;
 
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
+import org.commonjava.maven.atlas.ident.version.part.SnapshotPart;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.version.part.SnapshotPart;
 
 public class ArtifactPathInfo
 {
@@ -253,7 +254,7 @@ public class ArtifactPathInfo
 
     public ProjectVersionRef getProjectId()
     {
-        return new ProjectVersionRef( getGroupId(), getArtifactId(), getVersion() );
+        return new SimpleProjectVersionRef( getGroupId(), getArtifactId(), getVersion() );
     }
 
 }

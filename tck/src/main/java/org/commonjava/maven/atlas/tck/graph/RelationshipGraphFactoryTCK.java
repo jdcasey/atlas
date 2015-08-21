@@ -29,6 +29,7 @@ import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionException;
 import org.commonjava.maven.atlas.graph.traverse.RelationshipGraphTraversal;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.junit.Test;
 
 public abstract class RelationshipGraphFactoryTCK
@@ -39,9 +40,9 @@ public abstract class RelationshipGraphFactoryTCK
     public void openStoreDeleteAndReopen()
         throws Exception
     {
-        final ProjectVersionRef r = new ProjectVersionRef( "org.test", "root", "1" );
-        final ProjectVersionRef p = new ProjectVersionRef( "org.test", "parent", "1.0" );
-        final ProjectVersionRef c = new ProjectVersionRef( "org.test", "child", "1.0" );
+        final ProjectVersionRef r = new SimpleProjectVersionRef( "org.test", "root", "1" );
+        final ProjectVersionRef p = new SimpleProjectVersionRef( "org.test", "parent", "1.0" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "org.test", "child", "1.0" );
 
         final URI source = sourceURI();
 

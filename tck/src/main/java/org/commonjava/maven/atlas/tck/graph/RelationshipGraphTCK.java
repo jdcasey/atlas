@@ -36,6 +36,7 @@ import org.commonjava.maven.atlas.graph.traverse.AncestryTraversal;
 import org.commonjava.maven.atlas.graph.traverse.TraversalType;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,8 @@ public abstract class RelationshipGraphTCK
     public void createPath_ReturnNullWhenTargetVersionIsAnExpression()
         throws Exception
     {
-        final ProjectVersionRef from = new ProjectVersionRef( "org.from", "project", "1.0" );
-        final ProjectVersionRef to = new ProjectVersionRef( "org.to", "artifact", "${version.target}" );
+        final ProjectVersionRef from = new SimpleProjectVersionRef( "org.from", "project", "1.0" );
+        final ProjectVersionRef to = new SimpleProjectVersionRef( "org.to", "artifact", "${version.target}" );
 
         final URI src = new URI( "test:source-uri" );
         final ProjectRelationship<?> rel =
@@ -65,10 +66,10 @@ public abstract class RelationshipGraphTCK
         throws Exception
     {
         final URI src = sourceURI();
-        final ProjectVersionRef gav = new ProjectVersionRef( "g", "a", "v" );
+        final ProjectVersionRef gav = new SimpleProjectVersionRef( "g", "a", "v" );
 
-        final ProjectVersionRef d1 = new ProjectVersionRef( "g", "d1", "1" );
-        final ProjectVersionRef d2 = new ProjectVersionRef( "g", "d2", "2" );
+        final ProjectVersionRef d1 = new SimpleProjectVersionRef( "g", "d1", "1" );
+        final ProjectVersionRef d2 = new SimpleProjectVersionRef( "g", "d2", "2" );
 
         final RelationshipGraph graph =
             openGraph( new ViewParams( newWorkspaceId(), new DependencyFilter(), new ManagedDependencyMutator(), gav ),
@@ -90,9 +91,9 @@ public abstract class RelationshipGraphTCK
     public void connectThreeGraphsWithParentInterrelationships()
         throws Exception
     {
-        final ProjectVersionRef r = new ProjectVersionRef( "org.test", "root", "1" );
-        final ProjectVersionRef p = new ProjectVersionRef( "org.test", "parent", "1.0" );
-        final ProjectVersionRef c = new ProjectVersionRef( "org.test", "child", "1.0" );
+        final ProjectVersionRef r = new SimpleProjectVersionRef( "org.test", "root", "1" );
+        final ProjectVersionRef p = new SimpleProjectVersionRef( "org.test", "parent", "1.0" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "org.test", "child", "1.0" );
 
         final URI source = sourceURI();
 
@@ -130,9 +131,9 @@ public abstract class RelationshipGraphTCK
     public void connectThreeGraphsWithParentInterrelationships_WrongOrder()
         throws Exception
     {
-        final ProjectVersionRef r = new ProjectVersionRef( "org.test", "root", "1" );
-        final ProjectVersionRef p = new ProjectVersionRef( "org.test", "parent", "1.0" );
-        final ProjectVersionRef c = new ProjectVersionRef( "org.test", "child", "1.0" );
+        final ProjectVersionRef r = new SimpleProjectVersionRef( "org.test", "root", "1" );
+        final ProjectVersionRef p = new SimpleProjectVersionRef( "org.test", "parent", "1.0" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "org.test", "child", "1.0" );
 
         final URI source = sourceURI();
 

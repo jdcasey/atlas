@@ -28,8 +28,9 @@ import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
 import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
 import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.traverse.AncestryTraversal;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.tck.graph.AbstractSPI_TCK;
 import org.junit.Test;
 
@@ -41,9 +42,9 @@ public abstract class AncestryTraversalTCK
     public void traverseTwoAncestors()
         throws Exception
     {
-        final ProjectVersionRef myRef = new ProjectVersionRef( "my.group", "my-artifact", "1.0" );
-        final ProjectVersionRef parentRef = new ProjectVersionRef( "my.group", "my-dad", "1" );
-        final ProjectVersionRef grandRef = new ProjectVersionRef( "other.group", "grandpa", "20120821" );
+        final ProjectVersionRef myRef = new SimpleProjectVersionRef( "my.group", "my-artifact", "1.0" );
+        final ProjectVersionRef parentRef = new SimpleProjectVersionRef( "my.group", "my-dad", "1" );
+        final ProjectVersionRef grandRef = new SimpleProjectVersionRef( "other.group", "grandpa", "20120821" );
 
         final URI source = sourceURI();
         final RelationshipGraph graph = simpleGraph( myRef );
@@ -89,9 +90,9 @@ public abstract class AncestryTraversalTCK
     public void traverseTwoAncestorsWithEmptyGrandParentRels()
         throws Exception
     {
-        final ProjectVersionRef myRef = new ProjectVersionRef( "my.group", "my-artifact", "1.0" );
-        final ProjectVersionRef parentRef = new ProjectVersionRef( "my.group", "my-dad", "1" );
-        final ProjectVersionRef grandRef = new ProjectVersionRef( "other.group", "grandpa", "20120821" );
+        final ProjectVersionRef myRef = new SimpleProjectVersionRef( "my.group", "my-artifact", "1.0" );
+        final ProjectVersionRef parentRef = new SimpleProjectVersionRef( "my.group", "my-dad", "1" );
+        final ProjectVersionRef grandRef = new SimpleProjectVersionRef( "other.group", "grandpa", "20120821" );
 
         final URI source = sourceURI();
         final RelationshipGraph graph = simpleGraph( myRef );
@@ -128,22 +129,22 @@ public abstract class AncestryTraversalTCK
     public void traverseTwoAncestors_IgnoreNonParentRelationships()
         throws Exception
     {
-        final ProjectVersionRef myRef = new ProjectVersionRef( "my.group", "my-artifact", "1.0" );
-        final ProjectVersionRef parentRef = new ProjectVersionRef( "my.group", "my-dad", "1" );
-        final ProjectVersionRef grandRef = new ProjectVersionRef( "other.group", "grandpa", "20120821" );
+        final ProjectVersionRef myRef = new SimpleProjectVersionRef( "my.group", "my-artifact", "1.0" );
+        final ProjectVersionRef parentRef = new SimpleProjectVersionRef( "my.group", "my-dad", "1" );
+        final ProjectVersionRef grandRef = new SimpleProjectVersionRef( "other.group", "grandpa", "20120821" );
 
         final URI source = sourceURI();
         final RelationshipGraph graph = simpleGraph( myRef );
 
         /* @formatter:off */
         graph.storeRelationships( new ParentRelationship( source, myRef, parentRef ), 
-              new DependencyRelationship( source, myRef, new ArtifactRef( new ProjectVersionRef( "some.group", "foo", "1.0"   ), null, null, false ), null, 0, false ),
-              new DependencyRelationship( source, myRef, new ArtifactRef( new ProjectVersionRef( "some.group", "bar", "1.2.1" ), null, null, false ), null, 1, false ),
-              new PluginRelationship( source, myRef, new ProjectVersionRef( "org.apache.maven.plugins", "maven-compiler-plugin", "2.5.1" ), 0, false ),
-              new PluginRelationship( source, myRef, new ProjectVersionRef( "org.apache.maven.plugins","maven-jar-plugin", "2.2" ), 1, false ),
-              new ExtensionRelationship( source, myRef, new ProjectVersionRef( "org.apache.maven.plugins", "maven-compiler-plugin", "2.5.1" ), 0 ),
+              new DependencyRelationship( source, myRef, new SimpleArtifactRef( new SimpleProjectVersionRef( "some.group", "foo", "1.0"   ), null, null, false ), null, 0, false ),
+              new DependencyRelationship( source, myRef, new SimpleArtifactRef( new SimpleProjectVersionRef( "some.group", "bar", "1.2.1" ), null, null, false ), null, 1, false ),
+              new PluginRelationship( source, myRef, new SimpleProjectVersionRef( "org.apache.maven.plugins", "maven-compiler-plugin", "2.5.1" ), 0, false ),
+              new PluginRelationship( source, myRef, new SimpleProjectVersionRef( "org.apache.maven.plugins","maven-jar-plugin", "2.2" ), 1, false ),
+              new ExtensionRelationship( source, myRef, new SimpleProjectVersionRef( "org.apache.maven.plugins", "maven-compiler-plugin", "2.5.1" ), 0 ),
               new ParentRelationship( source, parentRef, grandRef ), 
-              new DependencyRelationship( source, parentRef, new ProjectVersionRef( "other.group", "utils", "3-1" ).asJarArtifact(), null, 0, false ) 
+              new DependencyRelationship( source, parentRef, new SimpleProjectVersionRef( "other.group", "utils", "3-1" ).asJarArtifact(), null, 0, false )
         );
         /* @formatter:on */
 

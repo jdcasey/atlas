@@ -29,7 +29,7 @@ public class VersionlessArtifactRefTest
     {
         final String g = "org.foo";
         final String a = "bar";
-        final VersionlessArtifactRef var = VersionlessArtifactRef.parse( String.format( "%s:%s", g, a ) );
+        final VersionlessArtifactRef var = SimpleVersionlessArtifactRef.parse( String.format( "%s:%s", g, a ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -44,7 +44,7 @@ public class VersionlessArtifactRefTest
         final String a = "bar";
         final String t = "zip";
 
-        final VersionlessArtifactRef var = VersionlessArtifactRef.parse( String.format( "%s:%s:%s", g, a, t ) );
+        final VersionlessArtifactRef var = SimpleVersionlessArtifactRef.parse( String.format( "%s:%s:%s", g, a, t ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -60,7 +60,8 @@ public class VersionlessArtifactRefTest
         final String t = "zip";
         final String c = "sources";
 
-        final VersionlessArtifactRef var = VersionlessArtifactRef.parse( String.format( "%s:%s:%s:%s", g, a, t, c ) );
+        final VersionlessArtifactRef var = SimpleVersionlessArtifactRef.parse(
+                String.format( "%s:%s:%s:%s", g, a, t, c ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -78,7 +79,7 @@ public class VersionlessArtifactRefTest
         final String c = "sources";
 
         final VersionlessArtifactRef var =
-            VersionlessArtifactRef.parse( String.format( "%s:%s:%s:%s:%s", g, a, t, v, c ) );
+            SimpleVersionlessArtifactRef.parse( String.format( "%s:%s:%s:%s:%s", g, a, t, v, c ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -94,7 +95,8 @@ public class VersionlessArtifactRefTest
         final String t = "zip";
         final String v = "1.0";
 
-        final VersionlessArtifactRef var = VersionlessArtifactRef.parse( String.format( "%s:%s:%s:%s", g, a, t, v ) );
+        final VersionlessArtifactRef var = SimpleVersionlessArtifactRef.parse(
+                String.format( "%s:%s:%s:%s", g, a, t, v ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -107,7 +109,7 @@ public class VersionlessArtifactRefTest
     {
         final String g = "org.foo";
         final String a = "bar";
-        final VersionlessArtifactRef var = VersionlessArtifactRef.parse( String.format( "%s:%s", g, a ) );
+        final VersionlessArtifactRef var = SimpleVersionlessArtifactRef.parse( String.format( "%s:%s", g, a ) );
 
         assertThat( var.getGroupId(), equalTo( g ) );
         assertThat( var.getArtifactId(), equalTo( a ) );
@@ -124,8 +126,8 @@ public class VersionlessArtifactRefTest
         final String v = "1";
         final String t = "jar";
 
-        final VersionlessArtifactRef r1 = new VersionlessArtifactRef( new ArtifactRef( g, a, v, t, null, false ) );
-        final VersionlessArtifactRef r2 = new VersionlessArtifactRef( new ArtifactRef( g, a, v, t, null, true ) );
+        final VersionlessArtifactRef r1 = new SimpleVersionlessArtifactRef( new SimpleArtifactRef( g, a, v, t, null, false ) );
+        final VersionlessArtifactRef r2 = new SimpleVersionlessArtifactRef( new SimpleArtifactRef( g, a, v, t, null, true ) );
 
         assertThat( r1.equals( r2 ), equalTo( false ) );
         assertThat( r1.hashCode() == r2.hashCode(), equalTo( false ) );
@@ -134,12 +136,12 @@ public class VersionlessArtifactRefTest
     @Test
     public void twoIdenticalArtifactsWrappedInVersionlessInstanceAreEqual_DefaultTypeAndClassifier()
     {
-        final ProjectVersionRef pvr = new ProjectVersionRef( "group", "artifact", "1" );
-        final ArtifactRef r1 = new ArtifactRef( pvr, null, null, false );
-        final ArtifactRef r2 = new ArtifactRef( pvr, null, null, false );
+        final ProjectVersionRef pvr = new SimpleProjectVersionRef( "group", "artifact", "1" );
+        final ArtifactRef r1 = new SimpleArtifactRef( pvr, null, null, false );
+        final ArtifactRef r2 = new SimpleArtifactRef( pvr, null, null, false );
 
-        final VersionlessArtifactRef vr1 = new VersionlessArtifactRef( r1 );
-        final VersionlessArtifactRef vr2 = new VersionlessArtifactRef( r2 );
+        final VersionlessArtifactRef vr1 = new SimpleVersionlessArtifactRef( r1 );
+        final VersionlessArtifactRef vr2 = new SimpleVersionlessArtifactRef( r2 );
 
         assertThat( vr1, equalTo( vr2 ) );
         assertThat( vr1.hashCode(), equalTo( vr2.hashCode() ) );
@@ -148,12 +150,12 @@ public class VersionlessArtifactRefTest
     @Test
     public void twoArtifactsWrappedInVersionlessInstanceAreNotEqualWhenTypeDiffers()
     {
-        final ProjectVersionRef pvr = new ProjectVersionRef( "group", "artifact", "1" );
-        final ArtifactRef r1 = new ArtifactRef( pvr, "jar", null, false );
-        final ArtifactRef r2 = new ArtifactRef( pvr, "pom", null, false );
+        final ProjectVersionRef pvr = new SimpleProjectVersionRef( "group", "artifact", "1" );
+        final ArtifactRef r1 = new SimpleArtifactRef( pvr, "jar", null, false );
+        final ArtifactRef r2 = new SimpleArtifactRef( pvr, "pom", null, false );
 
-        final VersionlessArtifactRef vr1 = new VersionlessArtifactRef( r1 );
-        final VersionlessArtifactRef vr2 = new VersionlessArtifactRef( r2 );
+        final VersionlessArtifactRef vr1 = new SimpleVersionlessArtifactRef( r1 );
+        final VersionlessArtifactRef vr2 = new SimpleVersionlessArtifactRef( r2 );
 
         assertThat( vr1.equals( vr2 ), equalTo( false ) );
         assertThat( vr1.hashCode() == vr2.hashCode(), equalTo( false ) );
@@ -162,12 +164,12 @@ public class VersionlessArtifactRefTest
     @Test
     public void twoArtifactsWrappedInVersionlessInstanceAreNotEqualWhenClassifierDiffers()
     {
-        final ProjectVersionRef pvr = new ProjectVersionRef( "group", "artifact", "1" );
-        final ArtifactRef r1 = new ArtifactRef( pvr, "jar", null, false );
-        final ArtifactRef r2 = new ArtifactRef( pvr, "jar", "foo", false );
+        final ProjectVersionRef pvr = new SimpleProjectVersionRef( "group", "artifact", "1" );
+        final ArtifactRef r1 = new SimpleArtifactRef( pvr, "jar", null, false );
+        final ArtifactRef r2 = new SimpleArtifactRef( pvr, "jar", "foo", false );
 
-        final VersionlessArtifactRef vr1 = new VersionlessArtifactRef( r1 );
-        final VersionlessArtifactRef vr2 = new VersionlessArtifactRef( r2 );
+        final VersionlessArtifactRef vr1 = new SimpleVersionlessArtifactRef( r1 );
+        final VersionlessArtifactRef vr2 = new SimpleVersionlessArtifactRef( r2 );
 
         assertThat( vr1.equals( vr2 ), equalTo( false ) );
         assertThat( vr1.hashCode() == vr2.hashCode(), equalTo( false ) );
@@ -176,13 +178,13 @@ public class VersionlessArtifactRefTest
     @Test
     public void twoArtifactsWrappedInVersionlessInstanceAreEqualWhenVersionDiffers()
     {
-        final ProjectVersionRef pvr1 = new ProjectVersionRef( "group", "artifact", "1" );
-        final ProjectVersionRef pvr2 = new ProjectVersionRef( "group", "artifact", "2" );
-        final ArtifactRef r1 = new ArtifactRef( pvr1, null, null, false );
-        final ArtifactRef r2 = new ArtifactRef( pvr2, null, null, false );
+        final ProjectVersionRef pvr1 = new SimpleProjectVersionRef( "group", "artifact", "1" );
+        final ProjectVersionRef pvr2 = new SimpleProjectVersionRef( "group", "artifact", "2" );
+        final ArtifactRef r1 = new SimpleArtifactRef( pvr1, null, null, false );
+        final ArtifactRef r2 = new SimpleArtifactRef( pvr2, null, null, false );
 
-        final VersionlessArtifactRef vr1 = new VersionlessArtifactRef( r1 );
-        final VersionlessArtifactRef vr2 = new VersionlessArtifactRef( r2 );
+        final VersionlessArtifactRef vr1 = new SimpleVersionlessArtifactRef( r1 );
+        final VersionlessArtifactRef vr2 = new SimpleVersionlessArtifactRef( r2 );
 
         assertThat( vr1, equalTo( vr2 ) );
         assertThat( vr1.hashCode(), equalTo( vr2.hashCode() ) );
@@ -191,17 +193,17 @@ public class VersionlessArtifactRefTest
     @Test
     public void twoArtifactsWrappedInVersionlessInstanceAreEqualWhenVersionDiffersWithRange()
     {
-        final ProjectVersionRef pvr1 = new ProjectVersionRef( "group", "artifact", "1" );
-        final ProjectVersionRef pvr2 = new ProjectVersionRef( "group", "artifact", "[2,3.1]" );
-        final ArtifactRef r1 = new ArtifactRef( pvr1, null, null, false );
-        final ArtifactRef r2 = new ArtifactRef( pvr2, null, null, false );
+        final ProjectVersionRef pvr1 = new SimpleProjectVersionRef( "group", "artifact", "1" );
+        final ProjectVersionRef pvr2 = new SimpleProjectVersionRef( "group", "artifact", "[2,3.1]" );
+        final ArtifactRef r1 = new SimpleArtifactRef( pvr1, null, null, false );
+        final ArtifactRef r2 = new SimpleArtifactRef( pvr2, null, null, false );
 
         // trigger parsing.
         r1.getVersionSpec();
         r2.getVersionSpec();
 
-        final VersionlessArtifactRef vr1 = new VersionlessArtifactRef( r1 );
-        final VersionlessArtifactRef vr2 = new VersionlessArtifactRef( r2 );
+        final VersionlessArtifactRef vr1 = new SimpleVersionlessArtifactRef( r1 );
+        final VersionlessArtifactRef vr2 = new SimpleVersionlessArtifactRef( r2 );
 
         assertThat( vr1, equalTo( vr2 ) );
         assertThat( vr1.hashCode(), equalTo( vr2.hashCode() ) );

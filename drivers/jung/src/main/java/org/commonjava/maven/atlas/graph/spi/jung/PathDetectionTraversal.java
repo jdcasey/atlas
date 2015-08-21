@@ -29,6 +29,7 @@ import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnection;
 import org.commonjava.maven.atlas.graph.spi.jung.model.JungGraphPath;
 import org.commonjava.maven.atlas.graph.traverse.AbstractTraversal;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 
 final class PathDetectionTraversal
     extends AbstractTraversal

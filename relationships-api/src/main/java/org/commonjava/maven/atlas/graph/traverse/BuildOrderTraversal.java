@@ -29,9 +29,7 @@ import org.commonjava.maven.atlas.graph.model.EProjectCycle;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionException;
 import org.commonjava.maven.atlas.graph.traverse.model.BuildOrder;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.*;
 
 public class BuildOrderTraversal
     extends AbstractFilteringTraversal
@@ -79,8 +77,8 @@ public class BuildOrderTraversal
             target = ( (ArtifactRef) target ).asProjectVersionRef();
         }
 
-        final ProjectRef baseDecl = new ProjectRef( decl.getGroupId(), decl.getArtifactId() );
-        final ProjectRef baseTgt = new ProjectRef( target.getGroupId(), target.getArtifactId() );
+        final ProjectRef baseDecl = new SimpleProjectRef( decl.getGroupId(), decl.getArtifactId() );
+        final ProjectRef baseTgt = new SimpleProjectRef( target.getGroupId(), target.getArtifactId() );
 
         int declIdx = order.indexOf( baseDecl );
         final int tgtIdx = order.indexOf( baseTgt );

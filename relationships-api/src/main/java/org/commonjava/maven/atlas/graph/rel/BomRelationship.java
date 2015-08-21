@@ -17,7 +17,6 @@ package org.commonjava.maven.atlas.graph.rel;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.Set;
 
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;

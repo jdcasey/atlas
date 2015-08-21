@@ -15,12 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph.traverse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.commonjava.maven.atlas.graph.filter.DependencyFilter;
 import org.commonjava.maven.atlas.graph.filter.OrFilter;
 import org.commonjava.maven.atlas.graph.filter.ParentFilter;
@@ -30,9 +24,12 @@ import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleVersionlessArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.VersionlessArtifactRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class TransitiveDependencyTraversal
     extends AbstractFilteringTraversal
@@ -72,7 +69,7 @@ public class TransitiveDependencyTraversal
         if ( relationship instanceof DependencyRelationship )
         {
             final ArtifactRef target = (ArtifactRef) relationship.getTarget();
-            final VersionlessArtifactRef versionlessTarget = new VersionlessArtifactRef( target );
+            final VersionlessArtifactRef versionlessTarget = new SimpleVersionlessArtifactRef( target );
 
             logger.debug( "Checking for seen versionless GA[TC]: {}", versionlessTarget );
             final Integer distance = seenArtifacts.get( versionlessTarget );

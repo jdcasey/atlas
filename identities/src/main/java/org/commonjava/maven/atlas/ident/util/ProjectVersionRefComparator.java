@@ -18,6 +18,7 @@ package org.commonjava.maven.atlas.ident.util;
 import java.util.Comparator;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.version.VersionSpec;
 
 public class ProjectVersionRefComparator

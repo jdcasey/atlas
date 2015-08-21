@@ -15,19 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph;
 
-import static org.apache.commons.lang.StringUtils.join;
-
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.commonjava.maven.atlas.graph.filter.AnyFilter;
 import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
@@ -36,6 +23,13 @@ import org.commonjava.maven.atlas.graph.mutate.ManagedDependencyMutator;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.apache.commons.lang.StringUtils.join;
 
 /**
  * <p>
@@ -507,7 +501,7 @@ public class ViewParams
          * Adds selected versions into selections map. To work properly keys
          * must be instances of {@link ProjectRef} or of the same class as the
          * one used in {@link ViewParams#getSelection(ProjectRef)} and
-         * {@link ViewParams#hasSelection(ProjectRef)}.
+         * {@link ViewParams#hasSelection(ProjectVersionRef)}.
          * 
          * @param selections
          *            map of {@link ProjectRef} to {@link ProjectVersionRef},

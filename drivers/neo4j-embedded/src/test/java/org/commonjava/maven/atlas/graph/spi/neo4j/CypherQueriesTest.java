@@ -23,8 +23,9 @@ import org.commonjava.maven.atlas.graph.ViewParams;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionFactory;
 import org.commonjava.maven.atlas.graph.spi.neo4j.fixture.FileConnectionFixture;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.tck.graph.AbstractSPI_TCK;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,18 +46,18 @@ public class CypherQueriesTest
     public void projectsWithVariableFlag_PartialQuery()
         throws Exception
     {
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef varDep = new ProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
-        final ProjectVersionRef varD2 = new ProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
-        final ProjectVersionRef selected = new ProjectVersionRef( varDep, "1.0-20130314.161200-1" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef varDep = new SimpleProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
+        final ProjectVersionRef varD2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
+        final ProjectVersionRef selected = new SimpleProjectVersionRef( varDep, "1.0-20130314.161200-1" );
 
         final URI source = sourceURI();
         RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
         graph.storeRelationships(
-            new DependencyRelationship( source, project, new ArtifactRef( varDep, null, null, false ), null, 0, false ),
-            new DependencyRelationship( source, varDep,  new ArtifactRef( varD2,  null, null, false ), null, 0, false )
+            new DependencyRelationship( source, project, new SimpleArtifactRef( varDep, null, null, false ), null, 0, false ),
+            new DependencyRelationship( source, varDep,  new SimpleArtifactRef( varD2,  null, null, false ), null, 0, false )
         );
 
         graph = graphFactory().open( new ViewParams.Builder( graph.getParams() ).withSelection( varDep.asProjectRef(), selected ).build(), false );
@@ -88,18 +89,18 @@ public class CypherQueriesTest
     public void projectsWithVariableFlagQuery()
         throws Exception
     {
-        final ProjectVersionRef project = new ProjectVersionRef( "org.my", "project", "1.0" );
-        final ProjectVersionRef varDep = new ProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
-        final ProjectVersionRef varD2 = new ProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
-        final ProjectVersionRef selected = new ProjectVersionRef( varDep, "1.0-20130314.161200-1" );
+        final ProjectVersionRef project = new SimpleProjectVersionRef( "org.my", "project", "1.0" );
+        final ProjectVersionRef varDep = new SimpleProjectVersionRef( "org.other", "dep", "1.0-SNAPSHOT" );
+        final ProjectVersionRef varD2 = new SimpleProjectVersionRef( "org.other", "dep2", "1.0-SNAPSHOT" );
+        final ProjectVersionRef selected = new SimpleProjectVersionRef( varDep, "1.0-20130314.161200-1" );
 
         final URI source = sourceURI();
         RelationshipGraph graph = simpleGraph( project );
 
         /* @formatter:off */
         graph.storeRelationships( 
-            new DependencyRelationship( source, project, new ArtifactRef( varDep, null, null, false ), null, 0, false ),
-            new DependencyRelationship( source, varDep,  new ArtifactRef( varD2,  null, null, false ), null, 0, false )
+            new DependencyRelationship( source, project, new SimpleArtifactRef( varDep, null, null, false ), null, 0, false ),
+            new DependencyRelationship( source, varDep,  new SimpleArtifactRef( varD2,  null, null, false ), null, 0, false )
         );
         
         graph = graphFactory().open( new ViewParams.Builder( graph.getParams()).withSelection( varDep.asProjectRef(), selected ).build(), false );

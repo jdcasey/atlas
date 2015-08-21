@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.commonjava.maven.atlas.ident.version.VersionSpec;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class ProjectVersionRefTest
         throws InvalidVersionSpecificationException
     {
         final String ver = "2.1.1.Final";
-        final ProjectVersionRef ref = new ProjectVersionRef( "g", "a", ver );
+        final ProjectVersionRef ref = new SimpleProjectVersionRef( "g", "a", ver );
         final VersionSpec spec = ref.getVersionSpec();
 
         assertThat( spec.renderStandard(), equalTo( ver ) );
@@ -44,8 +43,8 @@ public class ProjectVersionRefTest
     public void hashCodeEquality()
         throws InvalidVersionSpecificationException
     {
-        final ProjectVersionRef ref1 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
-        final ProjectVersionRef ref2 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref1 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref2 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
 
         assertThat( ref1.hashCode(), equalTo( ref2.hashCode() ) );
     }
@@ -54,8 +53,8 @@ public class ProjectVersionRefTest
     public void objectEquality()
         throws InvalidVersionSpecificationException
     {
-        final ProjectVersionRef ref1 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
-        final ProjectVersionRef ref2 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref1 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref2 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
 
         assertThat( ref1, equalTo( ref2 ) );
     }
@@ -64,8 +63,8 @@ public class ProjectVersionRefTest
     public void addTwoIdenticalRefsToASetAndVerifyThatOnlyOneIsAdded()
         throws InvalidVersionSpecificationException
     {
-        final ProjectVersionRef ref1 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
-        final ProjectVersionRef ref2 = new ProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref1 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
+        final ProjectVersionRef ref2 = new SimpleProjectVersionRef( "org.foo", "bar", "1.1.1-baz-1" );
 
         assertThat( ref1, equalTo( ref2 ) );
 
@@ -78,8 +77,8 @@ public class ProjectVersionRefTest
     public void addTwoIdenticalCompoundRefsToASetAndVerifyThatOnlyOneIsAdded()
         throws InvalidVersionSpecificationException
     {
-        final ProjectVersionRef ref1 = new ProjectVersionRef( "org.foo", "bar", "[1.1.1-baz-1,1.1.1-baz-2]" );
-        final ProjectVersionRef ref2 = new ProjectVersionRef( "org.foo", "bar", "[1.1.1-baz-1,1.1.1-baz-2]" );
+        final ProjectVersionRef ref1 = new SimpleProjectVersionRef( "org.foo", "bar", "[1.1.1-baz-1,1.1.1-baz-2]" );
+        final ProjectVersionRef ref2 = new SimpleProjectVersionRef( "org.foo", "bar", "[1.1.1-baz-1,1.1.1-baz-2]" );
 
         assertThat( ref1, equalTo( ref2 ) );
 

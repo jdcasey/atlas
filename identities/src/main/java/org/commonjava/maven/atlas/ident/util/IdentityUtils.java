@@ -15,9 +15,7 @@
  */
 package org.commonjava.maven.atlas.ident.util;
 
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.*;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 
 public final class IdentityUtils
@@ -30,26 +28,26 @@ public final class IdentityUtils
     public static ArtifactRef artifact( final String groupId, final String artifactId, final String version )
         throws InvalidVersionSpecificationException
     {
-        return new ArtifactRef( projectVersion( groupId, artifactId, version ), null, null, false );
+        return new SimpleArtifactRef( projectVersion( groupId, artifactId, version ), null, null, false );
     }
 
     public static ArtifactRef artifact( final ProjectVersionRef ref )
         throws InvalidVersionSpecificationException
     {
-        return new ArtifactRef( ref, null, null, false );
+        return new SimpleArtifactRef( ref, null, null, false );
     }
 
     public static ArtifactRef artifact( final String groupId, final String artifactId, final String version,
                                         final String type, final String classifier, final boolean optional )
         throws InvalidVersionSpecificationException
     {
-        return new ArtifactRef( projectVersion( groupId, artifactId, version ), type, classifier, optional );
+        return new SimpleArtifactRef( projectVersion( groupId, artifactId, version ), type, classifier, optional );
     }
 
     public static ArtifactRef artifact( final ProjectVersionRef dep, final String type, final String classifier,
                                         final boolean optional )
     {
-        return new ArtifactRef( dep, type, classifier, optional );
+        return new SimpleArtifactRef( dep, type, classifier, optional );
     }
 
     public static ProjectVersionRef projectVersion( final String src )
@@ -63,7 +61,7 @@ public final class IdentityUtils
 
         try
         {
-            return new ProjectVersionRef( parts[0], parts[1], parts[2] );
+            return new SimpleProjectVersionRef( parts[0], parts[1], parts[2] );
         }
         catch ( final InvalidVersionSpecificationException e )
         {
@@ -75,7 +73,7 @@ public final class IdentityUtils
     public static ProjectVersionRef projectVersion( final String groupId, final String artifactId, final String version )
         throws InvalidVersionSpecificationException
     {
-        return new ProjectVersionRef( groupId, artifactId, version );
+        return new SimpleProjectVersionRef( groupId, artifactId, version );
     }
 
     public static ProjectRef project( final String src )
@@ -87,13 +85,13 @@ public final class IdentityUtils
                 + "'. Must contain at least two fields separated by ':'" );
         }
 
-        return new ProjectRef( parts[0], parts[1] );
+        return new SimpleProjectRef( parts[0], parts[1] );
     }
 
     public static ProjectRef project( final String groupId, final String artifactId )
         throws InvalidVersionSpecificationException
     {
-        return new ProjectRef( groupId, artifactId );
+        return new SimpleProjectRef( groupId, artifactId );
     }
 
 }

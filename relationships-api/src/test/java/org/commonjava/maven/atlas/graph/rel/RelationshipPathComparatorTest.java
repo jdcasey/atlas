@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.junit.Rule;
 import org.junit.Test;

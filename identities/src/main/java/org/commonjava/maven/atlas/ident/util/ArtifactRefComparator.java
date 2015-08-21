@@ -18,6 +18,7 @@ package org.commonjava.maven.atlas.ident.util;
 import java.util.Comparator;
 
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 
 public class ArtifactRefComparator
     implements Comparator<ArtifactRef>

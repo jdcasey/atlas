@@ -15,39 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph.spi.neo4j;
 
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.CONFIG_ID;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.GA;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.GAV;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.NID;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.RELATIONSHIP_ID;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.RID;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.SOURCE_URI;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.VIEW_ID;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.addToURISetProperty;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.convertToProjects;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.convertToRelationships;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.getMetadataMap;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.getStringProperty;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.id;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.isConnected;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.markConnected;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.toNodeProperties;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.toProjectRelationship;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.toProjectVersionRef;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.toRelationshipProperties;
-import static org.commonjava.maven.atlas.graph.spi.neo4j.traverse.TraversalUtils.getGraphRelTypes;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.commonjava.maven.atlas.graph.RelationshipGraph;
 import org.commonjava.maven.atlas.graph.ViewParams;
 import org.commonjava.maven.atlas.graph.model.EProjectCycle;
@@ -62,13 +29,7 @@ import org.commonjava.maven.atlas.graph.spi.neo4j.io.ConversionCache;
 import org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.CyclePath;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.Neo4jGraphPath;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.AtlasCollector;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.MembershipWrappedTraversalEvaluator;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.PathCollectingVisitor;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.PathExistenceVisitor;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.SubPathsCollectingVisitor;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.TraversalUtils;
-import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.TraverseVisitor;
+import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.*;
 import org.commonjava.maven.atlas.graph.spi.neo4j.update.CycleCacheUpdater;
 import org.commonjava.maven.atlas.graph.spi.neo4j.update.ViewUpdater;
 import org.commonjava.maven.atlas.graph.traverse.RelationshipGraphTraversal;
@@ -79,12 +40,7 @@ import org.commonjava.maven.atlas.ident.util.JoinString;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -95,6 +51,12 @@ import org.neo4j.kernel.Traversal;
 import org.neo4j.kernel.Uniqueness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.*;
+
+import static org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions.*;
+import static org.commonjava.maven.atlas.graph.spi.neo4j.traverse.TraversalUtils.getGraphRelTypes;
 
 public class FileNeo4JGraphConnection
     implements Runnable, Neo4JGraphConnection

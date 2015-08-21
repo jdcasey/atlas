@@ -15,22 +15,8 @@
  */
 package org.commonjava.maven.atlas.graph.spi.jung;
 
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.UNKNOWN_SOURCE_URI;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import org.apache.commons.lang.StringUtils;
 import org.commonjava.maven.atlas.graph.RelationshipGraph;
 import org.commonjava.maven.atlas.graph.ViewParams;
@@ -56,8 +42,12 @@ import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationExcep
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
+import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.UNKNOWN_SOURCE_URI;
 
 public class JungGraphConnection
     implements RelationshipGraphConnection
@@ -892,9 +882,6 @@ public class JungGraphConnection
         }
     }
 
-    /**
-     * @deprecated Use {@link #getDirectRelationshipsFrom(GraphView,ProjectVersionRef,boolean,boolean,RelationshipType...)} instead
-     */
     @Deprecated
     @Override
     public Set<ProjectRelationship<?>> getDirectRelationshipsFrom( final ViewParams params,
@@ -968,9 +955,6 @@ public class JungGraphConnection
         return rels;
     }
 
-    /**
-     * @deprecated Use {@link #getDirectRelationshipsTo(GraphView,ProjectVersionRef,boolean,boolean,RelationshipType...)} instead
-     */
     @Deprecated
     @Override
     public Set<ProjectRelationship<?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,

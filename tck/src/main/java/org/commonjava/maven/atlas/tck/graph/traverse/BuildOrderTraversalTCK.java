@@ -33,9 +33,10 @@ import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.traverse.BuildOrderTraversal;
 import org.commonjava.maven.atlas.graph.traverse.model.BuildOrder;
 import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.tck.graph.AbstractSPI_TCK;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -48,9 +49,9 @@ public abstract class BuildOrderTraversalTCK
     public void simpleDependencyBuildOrder()
         throws Exception
     {
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();
@@ -61,8 +62,8 @@ public abstract class BuildOrderTraversalTCK
         final RelationshipGraph graph = simpleGraph( c );
 
         /* @formatter:off */
-        graph.storeRelationships( new DependencyRelationship( source, c, new ArtifactRef( b, null, null, false ), null, 0, false ),
-                                  new DependencyRelationship( source, b, new ArtifactRef( a, null, null, false ), null, 0, false ) );
+        graph.storeRelationships( new DependencyRelationship( source, c, new SimpleArtifactRef( b, null, null, false ), null, 0, false ),
+                                  new DependencyRelationship( source, b, new SimpleArtifactRef( a, null, null, false ), null, 0, false ) );
         /* @formatter:on */
 
         assertThat( graph.getAllRelationships()
@@ -84,10 +85,10 @@ public abstract class BuildOrderTraversalTCK
         throws Exception
 
     {
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
-        final ProjectVersionRef p = new ProjectVersionRef( "group.id", "b-parent", "1001" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef p = new SimpleProjectVersionRef( "group.id", "b-parent", "1001" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();
@@ -128,11 +129,11 @@ public abstract class BuildOrderTraversalTCK
     public void simpleDependencyBuildOrder_IgnorePluginPath()
         throws Exception
     {
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
-        final ProjectVersionRef pa = new ProjectVersionRef( "plugin.id", "p-a", "1" );
-        final ProjectVersionRef pb = new ProjectVersionRef( "plugin.id", "p-b", "2" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef pa = new SimpleProjectVersionRef( "plugin.id", "p-a", "1" );
+        final ProjectVersionRef pb = new SimpleProjectVersionRef( "plugin.id", "p-b", "2" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();
@@ -168,13 +169,13 @@ public abstract class BuildOrderTraversalTCK
     public void simpleDependencyBuildOrder_runtimeDepsOnly()
         throws Exception
     {
-        final ProjectVersionRef e = new ProjectVersionRef( "group.id", "e", "5" );
-        final ProjectVersionRef d = new ProjectVersionRef( "group.id", "d", "4" );
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
-        final ProjectVersionRef pa = new ProjectVersionRef( "plugin.id", "p-a", "1" );
-        final ProjectVersionRef pb = new ProjectVersionRef( "plugin.id", "p-b", "2" );
+        final ProjectVersionRef e = new SimpleProjectVersionRef( "group.id", "e", "5" );
+        final ProjectVersionRef d = new SimpleProjectVersionRef( "group.id", "d", "4" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef pa = new SimpleProjectVersionRef( "plugin.id", "p-a", "1" );
+        final ProjectVersionRef pb = new SimpleProjectVersionRef( "plugin.id", "p-b", "2" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();
@@ -214,10 +215,10 @@ public abstract class BuildOrderTraversalTCK
     public void simpleDependencyBuildOrder_ignoreExcluded()
         throws Exception
     {
-        final ProjectVersionRef d = new ProjectVersionRef( "group.id", "d", "4" );
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef d = new SimpleProjectVersionRef( "group.id", "d", "4" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();
@@ -255,11 +256,11 @@ public abstract class BuildOrderTraversalTCK
     public void simpleEverythingBuildOrder()
         throws Exception
     {
-        final ProjectVersionRef c = new ProjectVersionRef( "group.id", "c", "3" );
-        final ProjectVersionRef b = new ProjectVersionRef( "group.id", "b", "2" );
-        final ProjectVersionRef a = new ProjectVersionRef( "group.id", "a", "1" );
-        final ProjectVersionRef pa = new ProjectVersionRef( "plugin.dep.id", "p-a", "1" );
-        final ProjectVersionRef pb = new ProjectVersionRef( "plugin.id", "p-b", "2" );
+        final ProjectVersionRef c = new SimpleProjectVersionRef( "group.id", "c", "3" );
+        final ProjectVersionRef b = new SimpleProjectVersionRef( "group.id", "b", "2" );
+        final ProjectVersionRef a = new SimpleProjectVersionRef( "group.id", "a", "1" );
+        final ProjectVersionRef pa = new SimpleProjectVersionRef( "plugin.dep.id", "p-a", "1" );
+        final ProjectVersionRef pb = new SimpleProjectVersionRef( "plugin.id", "p-b", "2" );
 
         final Map<ProjectVersionRef, ProjectVersionRef> relativeOrder =
             new HashMap<ProjectVersionRef, ProjectVersionRef>();

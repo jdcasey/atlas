@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.util.VersionUtils;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.junit.Rule;
@@ -45,13 +46,13 @@ public class ParentRelationshipTest
         throws InvalidVersionSpecificationException, URISyntaxException
     {
         final ProjectVersionRef projectRef =
-            new ProjectVersionRef( "org.foo", "foobar", VersionUtils.createSingleVersion( "1.0" ) );
+            new SimpleProjectVersionRef( "org.foo", "foobar", VersionUtils.createSingleVersion( "1.0" ) );
 
         final ProjectVersionRef project2Ref =
-            new ProjectVersionRef( "org.foo", "footoo", VersionUtils.createSingleVersion( "1.0" ) );
+            new SimpleProjectVersionRef( "org.foo", "footoo", VersionUtils.createSingleVersion( "1.0" ) );
 
         final ProjectVersionRef parentRef =
-            new ProjectVersionRef( "org.foo", "foobar-parent", VersionUtils.createSingleVersion( "1" ) );
+            new SimpleProjectVersionRef( "org.foo", "foobar-parent", VersionUtils.createSingleVersion( "1" ) );
 
         final URI source = testURI();
         final ParentRelationship pr = new ParentRelationship( source, projectRef, parentRef );

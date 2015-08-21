@@ -15,14 +15,15 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.Collection;
-
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.version.SingleVersion;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.Collection;
 
 public final class PluginDependencyRelationship
     extends AbstractProjectRelationship<ArtifactRef>
@@ -152,7 +153,7 @@ public final class PluginDependencyRelationship
     {
         final ProjectVersionRef d = getDeclaring();
         ArtifactRef t = getTarget();
-        t = new ArtifactRef( t.selectVersion( version, force ), t.getType(), t.getClassifier(), t.isOptional() );
+        t = new SimpleArtifactRef( t.selectVersion( version, force ), t.getType(), t.getClassifier(), t.isOptional() );
 
         return new PluginDependencyRelationship( getSources(), getPomLocation(), d, getPlugin(), t, getIndex(),
                                                  isManaged() );
@@ -173,7 +174,7 @@ public final class PluginDependencyRelationship
         final ProjectVersionRef d = getDeclaring();
         ArtifactRef t = getTarget();
         t =
-            (ArtifactRef) ( ( ref instanceof ArtifactRef ) ? ref : new ArtifactRef( ref, t.getType(),
+            (ArtifactRef) ( ( ref instanceof ArtifactRef ) ? ref : new SimpleArtifactRef( ref, t.getType(),
                                                                                     t.getClassifier(), t.isOptional() ) );
 
         return new PluginDependencyRelationship( getSources(), getPomLocation(), d, getPlugin(), t, getIndex(),

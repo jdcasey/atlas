@@ -20,7 +20,9 @@ import java.net.URI;
 import java.util.Collection;
 
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.version.SingleVersion;
 
 public final class PluginRelationship
@@ -117,7 +119,7 @@ public final class PluginRelationship
     @Override
     public ArtifactRef getTargetArtifact()
     {
-        return new ArtifactRef( getTarget(), "maven-plugin", null, false );
+        return new SimpleArtifactRef( getTarget(), "maven-plugin", null, false );
     }
 
     @Override

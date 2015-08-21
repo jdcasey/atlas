@@ -15,18 +15,19 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
+import org.commonjava.maven.atlas.ident.DependencyScope;
+import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
+import org.commonjava.maven.atlas.ident.version.SingleVersion;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.version.SingleVersion;
 
 public final class DependencyRelationship
     extends AbstractProjectRelationship<ArtifactRef>
@@ -162,7 +163,7 @@ public final class DependencyRelationship
     {
         final ProjectVersionRef d = getDeclaring();
         ArtifactRef t = getTarget();
-        t = new ArtifactRef( t.selectVersion( version, force ), t.getType(), t.getClassifier(), t.isOptional() );
+        t = new SimpleArtifactRef( t.selectVersion( version, force ), t.getType(), t.getClassifier(), t.isOptional() );
 
         Set<ProjectRef> var = getExcludes();
         return new DependencyRelationship( getSources(), getPomLocation(), d, t, getScope(), getIndex(), isManaged(),
@@ -185,7 +186,7 @@ public final class DependencyRelationship
         final ProjectVersionRef d = getDeclaring();
         ArtifactRef t = getTarget();
         t =
-            (ArtifactRef) ( ( ref instanceof ArtifactRef ) ? ref : new ArtifactRef( ref, t.getType(),
+            (ArtifactRef) ( ( ref instanceof ArtifactRef ) ? ref : new SimpleArtifactRef( ref, t.getType(),
                                                                                     t.getClassifier(), t.isOptional() ) );
 
         Set<ProjectRef> var = getExcludes();

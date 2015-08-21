@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.version.SingleVersion;
 
 public interface ProjectRelationship<T extends ProjectVersionRef>

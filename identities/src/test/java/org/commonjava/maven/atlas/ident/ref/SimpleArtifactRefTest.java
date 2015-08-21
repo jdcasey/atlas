@@ -21,13 +21,13 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class ArtifactRefTest
+public class SimpleArtifactRefTest
 {
 
     @Test( expected = InvalidRefException.class )
     public void failParsingGA()
     {
-        ArtifactRef.parse( "org.foo:bar" );
+        SimpleArtifactRef.parse( "org.foo:bar" );
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ArtifactRefTest
         final String a = "bar";
         final String v = "1.0";
 
-        final ArtifactRef ar = ArtifactRef.parse( String.format( "%s:%s:%s", g, a, v ) );
+        final ArtifactRef ar = SimpleArtifactRef.parse( String.format( "%s:%s:%s", g, a, v ) );
 
         assertThat( ar.getGroupId(), equalTo( g ) );
         assertThat( ar.getArtifactId(), equalTo( a ) );
@@ -54,7 +54,7 @@ public class ArtifactRefTest
         final String v = "1.0";
         final String t = "zip";
 
-        final ArtifactRef ar = ArtifactRef.parse( String.format( "%s:%s:%s:%s", g, a, t, v ) );
+        final ArtifactRef ar = SimpleArtifactRef.parse( String.format( "%s:%s:%s:%s", g, a, t, v ) );
 
         assertThat( ar.getGroupId(), equalTo( g ) );
         assertThat( ar.getArtifactId(), equalTo( a ) );
@@ -72,7 +72,7 @@ public class ArtifactRefTest
         final String t = "zip";
         final String c = "sources";
 
-        final ArtifactRef ar = ArtifactRef.parse( String.format( "%s:%s:%s:%s:%s", g, a, t, v, c ) );
+        final ArtifactRef ar = SimpleArtifactRef.parse( String.format( "%s:%s:%s:%s:%s", g, a, t, v, c ) );
 
         assertThat( ar.getGroupId(), equalTo( g ) );
         assertThat( ar.getArtifactId(), equalTo( a ) );

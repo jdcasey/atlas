@@ -24,9 +24,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -255,7 +253,7 @@ public class ProjectRelationshipSerializerModule
             }
 
             String decl = (String) ast.get( DECLARING_REF );
-            final ProjectVersionRef declaring = ProjectVersionRef.parse( decl );
+            final ProjectVersionRef declaring = SimpleProjectVersionRef.parse( decl );
 
             String tgt = (String) ast.get( TARGET_REF );
             Integer index = (Integer) ast.get( INDEX );
@@ -272,7 +270,7 @@ public class ProjectRelationshipSerializerModule
             {
                 case DEPENDENCY:
                 {
-                    final ArtifactRef target = ArtifactRef.parse( tgt );
+                    final ArtifactRef target = SimpleArtifactRef.parse( tgt );
 
                     String scp = (String) ast.get(SCOPE);
                     final DependencyScope scope;
@@ -291,21 +289,21 @@ public class ProjectRelationshipSerializerModule
                 }
                 case EXTENSION:
                 {
-                    final ProjectVersionRef target = ProjectVersionRef.parse( tgt );
+                    final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
                     rel = new ExtensionRelationship( sources, pomLocation, declaring, target, index );
                     break;
                 }
                 case PARENT:
                 {
-                    final ProjectVersionRef target = ProjectVersionRef.parse( tgt );
+                    final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
                     rel = new ParentRelationship( sources, declaring, target );
                     break;
                 }
                 case PLUGIN:
                 {
-                    final ProjectVersionRef target = ProjectVersionRef.parse( tgt );
+                    final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
                     Boolean report = (Boolean) ast.get( REPORTING );
                     rel = new PluginRelationship( sources, pomLocation, declaring, target, index,
@@ -322,8 +320,8 @@ public class ProjectRelationshipSerializerModule
                                 jp.getCurrentLocation() );
                     }
 
-                    final ProjectRef plugin = ProjectRef.parse( plug );
-                    final ArtifactRef target = ArtifactRef.parse( tgt );
+                    final ProjectRef plugin = SimpleProjectRef.parse( plug );
+                    final ArtifactRef target = SimpleArtifactRef.parse( tgt );
 
                     rel = new PluginDependencyRelationship( sources, pomLocation, declaring, plugin, target, index,
                                                             managed );
@@ -331,7 +329,7 @@ public class ProjectRelationshipSerializerModule
                 }
                 case BOM:
                 {
-                    final ProjectVersionRef target = ProjectVersionRef.parse( tgt );
+                    final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
                     rel = new BomRelationship( sources, pomLocation, declaring, target, index );
                     break;

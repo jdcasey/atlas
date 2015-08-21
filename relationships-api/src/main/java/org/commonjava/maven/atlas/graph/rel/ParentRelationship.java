@@ -15,14 +15,15 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
+import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
+import org.commonjava.maven.atlas.ident.version.SingleVersion;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
-
-import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.version.SingleVersion;
 
 public final class ParentRelationship
     extends AbstractProjectRelationship<ProjectVersionRef>
@@ -85,7 +86,7 @@ public final class ParentRelationship
     @Override
     public ArtifactRef getTargetArtifact()
     {
-        return new ArtifactRef( getTarget(), "pom", null, false );
+        return new SimpleArtifactRef( getTarget(), "pom", null, false );
     }
 
     public boolean isTerminus()

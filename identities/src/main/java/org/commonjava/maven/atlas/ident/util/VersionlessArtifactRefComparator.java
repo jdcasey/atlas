@@ -15,9 +15,9 @@
  */
 package org.commonjava.maven.atlas.ident.util;
 
-import java.util.Comparator;
-
 import org.commonjava.maven.atlas.ident.ref.VersionlessArtifactRef;
+
+import java.util.Comparator;
 
 public class VersionlessArtifactRefComparator
     implements Comparator<VersionlessArtifactRef>
