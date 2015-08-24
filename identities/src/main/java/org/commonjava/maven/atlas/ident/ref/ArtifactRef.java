@@ -16,5 +16,7 @@ public interface ArtifactRef
 
     boolean isOptional();
 
+    ArtifactRef setOptional(boolean optional );
+
     boolean versionlessEquals( ProjectVersionRef other );
 }
