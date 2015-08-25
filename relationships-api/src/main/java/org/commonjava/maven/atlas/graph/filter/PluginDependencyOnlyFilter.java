@@ -47,7 +47,7 @@ public class PluginDependencyOnlyFilter
     }
 
     @Override
-    public boolean doAccept( final ProjectRelationship<?> rel )
+    public boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
         final PluginDependencyRelationship pdr = (PluginDependencyRelationship) rel;
         if ( plugin.equals( pdr.getPlugin() ) )
@@ -66,7 +66,7 @@ public class PluginDependencyOnlyFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         return NoneFilter.INSTANCE;
     }

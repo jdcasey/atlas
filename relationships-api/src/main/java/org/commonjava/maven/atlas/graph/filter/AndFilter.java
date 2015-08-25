@@ -39,7 +39,7 @@ public class AndFilter
     }
 
     @Override
-    public boolean accept( final ProjectRelationship<?> rel )
+    public boolean accept( final ProjectRelationship<?, ?> rel )
     {
         boolean accepted = true;
         for ( final ProjectRelationshipFilter filter : getFilters() )

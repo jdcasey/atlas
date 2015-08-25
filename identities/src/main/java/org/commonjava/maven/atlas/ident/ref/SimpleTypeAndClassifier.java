@@ -45,7 +45,7 @@ public class SimpleTypeAndClassifier
     @Override
     public String getType()
     {
-        return type;
+        return type == null ? "jar" : type;
     }
 
     @Override

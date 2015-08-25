@@ -25,10 +25,7 @@ import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
 import org.commonjava.maven.atlas.graph.model.EProjectCycle;
 import org.commonjava.maven.atlas.graph.model.GraphPath;
 import org.commonjava.maven.atlas.graph.model.GraphPathInfo;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
-import org.commonjava.maven.atlas.graph.rel.RelationshipComparator;
-import org.commonjava.maven.atlas.graph.rel.RelationshipType;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnection;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionException;
 import org.commonjava.maven.atlas.graph.spi.jung.model.JungGraphPath;
@@ -56,8 +53,8 @@ public class JungGraphConnection
 
     private boolean closed = false;
 
-    private DirectedGraph<ProjectVersionRef, ProjectRelationship<?>> graph =
-        new DirectedSparseMultigraph<ProjectVersionRef, ProjectRelationship<?>>();
+    private DirectedGraph<ProjectVersionRef, ProjectRelationship<?, ?>> graph =
+        new DirectedSparseMultigraph<ProjectVersionRef, ProjectRelationship<?, ?>>();
 
     private final Map<ProjectRef, Set<ProjectVersionRef>> byGA = new HashMap<ProjectRef, Set<ProjectVersionRef>>();
 
@@ -82,37 +79,37 @@ public class JungGraphConnection
     }
 
     @Override
-    public Collection<? extends ProjectRelationship<?>> getRelationshipsDeclaredBy( final ViewParams params,
+    public Collection<? extends ProjectRelationship<?, ?>> getRelationshipsDeclaredBy( final ViewParams params,
                                                                                     final ProjectVersionRef ref )
     {
         return imposeSelections( params, graph.getOutEdges( ref.asProjectVersionRef() ) );
     }
 
     @Override
-    public Collection<? extends ProjectRelationship<?>> getRelationshipsTargeting( final ViewParams params,
+    public Collection<? extends ProjectRelationship<?, ?>> getRelationshipsTargeting( final ViewParams params,
                                                                                    final ProjectVersionRef ref )
     {
         return imposeSelections( params, graph.getInEdges( ref.asProjectVersionRef() ) );
     }
 
     @Override
-    public Collection<ProjectRelationship<?>> getAllRelationships( final ViewParams params )
+    public Collection<ProjectRelationship<?, ?>> getAllRelationships( final ViewParams params )
     {
         return imposeSelections( params, graph.getEdges() );
     }
 
-    private Collection<ProjectRelationship<?>> imposeSelections( final ViewParams params,
-                                                                 final Collection<ProjectRelationship<?>> edges )
+    private Collection<ProjectRelationship<?, ?>> imposeSelections( final ViewParams params,
+                                                                 final Collection<ProjectRelationship<?, ?>> edges )
     {
         if ( edges == null || edges.isEmpty() )
         {
             return edges;
         }
 
-        final List<ProjectRelationship<?>> result = new ArrayList<ProjectRelationship<?>>( edges.size() );
-        for ( final ProjectRelationship<?> edge : edges )
+        final List<ProjectRelationship<?, ?>> result = new ArrayList<ProjectRelationship<?, ?>>( edges.size() );
+        for ( final ProjectRelationship<?, ?> edge : edges )
         {
-            if ( ( edge instanceof ParentRelationship ) && ( (ParentRelationship) edge ).isTerminus() )
+            if ( ( edge instanceof SimpleParentRelationship ) && ( (ParentRelationship) edge ).isTerminus() )
             {
                 continue;
             }
@@ -180,10 +177,10 @@ public class JungGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> addRelationships( final ProjectRelationship<?>... rels )
+    public Set<ProjectRelationship<?, ?>> addRelationships( final ProjectRelationship<?, ?>... rels )
     {
-        final Set<ProjectRelationship<?>> skipped = new HashSet<ProjectRelationship<?>>();
-        for ( final ProjectRelationship<?> rel : rels )
+        final Set<ProjectRelationship<?, ?>> skipped = new HashSet<ProjectRelationship<?, ?>>();
+        for ( final ProjectRelationship<?, ?> rel : rels )
         {
             if ( !graph.containsVertex( rel.getDeclaring() ) )
             {
@@ -194,10 +191,10 @@ public class JungGraphConnection
 
             final ProjectVersionRef target = rel.getTarget()
                                                 .asProjectVersionRef();
-            if ( !target.getVersionSpec()
+            if ( target.isVariableVersion() || !target.getVersionSpec()
                         .isSingle() )
             {
-                // logger.info( "Adding variable target: %s", target );
+                 logger.info( "Adding variable target: {}", target );
                 variableSubgraphs.add( target );
             }
             else if ( !graph.containsVertex( target ) )
@@ -213,8 +210,8 @@ public class JungGraphConnection
                 addGA( target );
             }
 
-            final List<ProjectRelationship<?>> edges =
-                new ArrayList<ProjectRelationship<?>>( graph.findEdgeSet( rel.getDeclaring(), target ) );
+            final List<ProjectRelationship<?, ?>> edges =
+                new ArrayList<ProjectRelationship<?, ?>>( graph.findEdgeSet( rel.getDeclaring(), target ) );
             if ( !edges.contains( rel ) )
             {
                 // logger.info( "Adding edge: %s -> %s", rel.getDeclaring(), target );
@@ -223,7 +220,7 @@ public class JungGraphConnection
             else
             {
                 final int idx = edges.indexOf( rel );
-                final ProjectRelationship<?> existing = edges.get( idx );
+                final ProjectRelationship<?, ?> existing = edges.get( idx );
 
                 // logger.info( "Adding sources: %s to existing edge: %s", rel.getSources(), existing );
 
@@ -234,7 +231,7 @@ public class JungGraphConnection
             incompleteSubgraphs.remove( rel.getDeclaring() );
         }
 
-        for ( final ProjectRelationship<?> rel : rels )
+        for ( final ProjectRelationship<?, ?> rel : rels )
         {
             if ( skipped.contains( rel ) )
             {
@@ -278,7 +275,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public Set<List<ProjectRelationship<?>>> getAllPathsTo( final ViewParams params, final ProjectVersionRef... refs )
+    public Set<List<ProjectRelationship<?, ?>>> getAllPathsTo( final ViewParams params, final ProjectVersionRef... refs )
     {
         final PathDetectionTraversal traversal = new PathDetectionTraversal( this, params, refs );
 
@@ -297,7 +294,7 @@ public class JungGraphConnection
         }
 
         final Set<JungGraphPath> paths = traversal.getPaths();
-        final Set<List<ProjectRelationship<?>>> result = new HashSet<List<ProjectRelationship<?>>>( paths.size() );
+        final Set<List<ProjectRelationship<?, ?>>> result = new HashSet<List<ProjectRelationship<?, ?>>>( paths.size() );
         for ( final JungGraphPath path : paths )
         {
             result.add( path.getPathElements() );
@@ -307,7 +304,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public boolean introducesCycle( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean introducesCycle( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         final CycleDetectionTraversal traversal = new CycleDetectionTraversal( rel );
 
@@ -359,24 +356,24 @@ public class JungGraphConnection
                              final RelationshipGraphTraversal traversal, final JungGraphPath path,
                              final GraphPathInfo pathInfo )
     {
-        final List<ProjectRelationship<?>> edges = getSortedOutEdges( params, node );
+        final List<ProjectRelationship<?, ?>> edges = getSortedOutEdges( params, node );
         if ( edges != null )
         {
-            for ( final ProjectRelationship<?> edge : edges )
+            for ( final ProjectRelationship<?, ?> edge : edges )
             {
-                final ProjectRelationship<?> realEdge = pathInfo.selectRelationship( edge, path );
+                final ProjectRelationship<?, ?> realEdge = pathInfo.selectRelationship( edge, path );
                 if ( realEdge == null )
                 {
                     continue;
                 }
 
                 final JungGraphPath next = new JungGraphPath( path, realEdge );
-                final List<ProjectRelationship<?>> pathElements = next.getPathElements();
+                final List<ProjectRelationship<?, ?>> pathElements = next.getPathElements();
 
                 if ( traversal.traverseEdge( realEdge, pathElements ) )
                 {
                     final GraphPathInfo nextInfo = pathInfo.getChildPathInfo( realEdge );
-                    if ( !( edge instanceof ParentRelationship ) || !( (ParentRelationship) edge ).isTerminus() )
+                    if ( !( edge instanceof SimpleParentRelationship ) || !( (ParentRelationship) edge ).isTerminus() )
                     {
                         if ( next.hasCycle() )
                         {
@@ -420,18 +417,18 @@ public class JungGraphConnection
                 continue;
             }
 
-            final List<ProjectRelationship<?>> edges = getSortedOutEdges( params, node );
+            final List<ProjectRelationship<?, ?>> edges = getSortedOutEdges( params, node );
             if ( edges != null )
             {
-                for ( final ProjectRelationship<?> edge : edges )
+                for ( final ProjectRelationship<?, ?> edge : edges )
                 {
-                    final ProjectRelationship<?> realEdge = pathInfo.selectRelationship( edge, path );
+                    final ProjectRelationship<?, ?> realEdge = pathInfo.selectRelationship( edge, path );
                     if ( realEdge == null )
                     {
                         continue;
                     }
 
-                    final List<ProjectRelationship<?>> pathElements = path.getPathElements();
+                    final List<ProjectRelationship<?, ?>> pathElements = path.getPathElements();
                     // call traverseEdge no matter what, to allow traversal to "see" all relationships.
                     if ( traversal.traverseEdge( realEdge, pathElements ) )
                     {
@@ -439,7 +436,7 @@ public class JungGraphConnection
                         final GraphPathInfo nextInfo = pathInfo.getChildPathInfo( realEdge );
 
                         // Don't account for terminal parent relationship.
-                        if ( !( realEdge instanceof ParentRelationship )
+                        if ( !( realEdge instanceof SimpleParentRelationship )
                             || !( (ParentRelationship) realEdge ).isTerminus() )
                         {
                             if ( next.hasCycle() )
@@ -462,20 +459,20 @@ public class JungGraphConnection
         }
     }
 
-    private List<ProjectRelationship<?>> getSortedOutEdges( final ViewParams params, final ProjectVersionRef node )
+    private List<ProjectRelationship<?, ?>> getSortedOutEdges( final ViewParams params, final ProjectVersionRef node )
     {
-        Collection<ProjectRelationship<?>> unsorted = graph.getOutEdges( node.asProjectVersionRef() );
+        Collection<ProjectRelationship<?, ?>> unsorted = graph.getOutEdges( node.asProjectVersionRef() );
         if ( unsorted == null )
         {
             return null;
         }
 
-        unsorted = new ArrayList<ProjectRelationship<?>>( unsorted );
+        unsorted = new ArrayList<ProjectRelationship<?, ?>>( unsorted );
 
         RelationshipUtils.filterTerminalParents( unsorted );
 
-        final List<ProjectRelationship<?>> sorted =
-            new ArrayList<ProjectRelationship<?>>( imposeSelections( params, unsorted ) );
+        final List<ProjectRelationship<?, ?>> sorted =
+            new ArrayList<ProjectRelationship<?, ?>>( imposeSelections( params, unsorted ) );
         Collections.sort( sorted, RelationshipComparator.INSTANCE );
 
         return sorted;
@@ -511,17 +508,17 @@ public class JungGraphConnection
     }
 
     @Override
-    public boolean containsRelationship( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean containsRelationship( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         return graph.containsEdge( rel );
     }
 
     public void restrictProjectMembership( final Collection<ProjectVersionRef> refs )
     {
-        final Set<ProjectRelationship<?>> rels = new HashSet<ProjectRelationship<?>>();
+        final Set<ProjectRelationship<?, ?>> rels = new HashSet<ProjectRelationship<?, ?>>();
         for ( final ProjectVersionRef ref : refs )
         {
-            final Collection<ProjectRelationship<?>> edges = graph.getOutEdges( ref.asProjectVersionRef() );
+            final Collection<ProjectRelationship<?, ?>> edges = graph.getOutEdges( ref.asProjectVersionRef() );
             if ( edges != null )
             {
                 rels.addAll( edges );
@@ -531,13 +528,13 @@ public class JungGraphConnection
         restrictRelationshipMembership( rels );
     }
 
-    public void restrictRelationshipMembership( final Collection<ProjectRelationship<?>> rels )
+    public void restrictRelationshipMembership( final Collection<ProjectRelationship<?, ?>> rels )
     {
-        graph = new DirectedSparseMultigraph<ProjectVersionRef, ProjectRelationship<?>>();
+        graph = new DirectedSparseMultigraph<ProjectVersionRef, ProjectRelationship<?, ?>>();
         incompleteSubgraphs.clear();
         variableSubgraphs.clear();
 
-        addRelationships( rels.toArray( new ProjectRelationship<?>[rels.size()] ) );
+        addRelationships( rels.toArray( new ProjectRelationship<?, ?>[rels.size()] ) );
 
         recomputeIncompleteSubgraphs();
     }
@@ -577,6 +574,14 @@ public class JungGraphConnection
     public Set<ProjectVersionRef> getMissingProjects( final ViewParams params )
     {
         final Set<ProjectVersionRef> result = new HashSet<ProjectVersionRef>( incompleteSubgraphs );
+        for ( ProjectVersionRef ref: variableSubgraphs )
+        {
+            ProjectVersionRef selected = params.getSelection( ref );
+            if ( selected != null && !containsProject( params, selected ) )
+            {
+                result.add( selected );
+            }
+        }
         // logger.info( "Got %d missing projects: %s", result.size(), result );
         return result;
     }
@@ -590,7 +595,20 @@ public class JungGraphConnection
     @Override
     public Set<ProjectVersionRef> getVariableProjects( final ViewParams params )
     {
-        return new HashSet<ProjectVersionRef>( variableSubgraphs );
+        Set<ProjectVersionRef> refs = new HashSet<ProjectVersionRef>( variableSubgraphs );
+        for ( Iterator<ProjectVersionRef> iter = refs.iterator(); iter.hasNext(); )
+        {
+            ProjectVersionRef gav = iter.next();
+            logger.debug("Checking for selection of: {}", gav);
+            if ( params.hasSelection( gav ) )
+            {
+                logger.debug( "Removing variable GAV: {}", gav );
+                iter.remove();
+            }
+        }
+
+        logger.debug( "Resulting variable set: {}", refs );
+        return refs;
     }
 
     @Override
@@ -602,7 +620,7 @@ public class JungGraphConnection
             changed = this.cycles.add( cycle );
         }
 
-        for ( final ProjectRelationship<?> rel : cycle )
+        for ( final ProjectRelationship<?, ?> rel : cycle )
         {
             incompleteSubgraphs.remove( rel.getDeclaring() );
         }
@@ -625,7 +643,7 @@ public class JungGraphConnection
             final ProjectRelationshipFilter filter = params.getFilter();
             nextCycle: for ( final EProjectCycle cycle : cycles )
             {
-                for ( final ProjectRelationship<?> r : cycle )
+                for ( final ProjectRelationship<?, ?> r : cycle )
                 {
                     if ( !filter.accept( r ) )
                     {
@@ -641,7 +659,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public boolean isCycleParticipant( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean isCycleParticipant( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         for ( final EProjectCycle cycle : cycles )
         {
@@ -677,7 +695,7 @@ public class JungGraphConnection
 
         for ( final ProjectVersionRef vertex : getAllProjects( params ) )
         {
-            final Collection<? extends ProjectRelationship<?>> outEdges = getRelationshipsDeclaredBy( params, vertex );
+            final Collection<? extends ProjectRelationship<?, ?>> outEdges = getRelationshipsDeclaredBy( params, vertex );
             if ( outEdges != null && !outEdges.isEmpty() )
             {
                 incompleteSubgraphs.remove( vertex );
@@ -884,7 +902,7 @@ public class JungGraphConnection
 
     @Deprecated
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsFrom( final ViewParams params,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( final ViewParams params,
                                                                    final ProjectVersionRef from,
                                                                    final boolean includeManagedInfo,
                                                                    final RelationshipType... types )
@@ -893,7 +911,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsFrom( final ViewParams params,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( final ViewParams params,
                                                                    final ProjectVersionRef from,
                                                                    final boolean includeManagedInfo,
                                                                    final boolean includeConcreteInfo,
@@ -903,7 +921,7 @@ public class JungGraphConnection
                                          includeConcreteInfo, types );
     }
 
-    private Set<ProjectRelationship<?>> getMatchingRelationships( final Collection<ProjectRelationship<?>> edges,
+    private Set<ProjectRelationship<?, ?>> getMatchingRelationships( final Collection<ProjectRelationship<?, ?>> edges,
                                                                   final ViewParams params,
                                                                   final boolean includeManagedInfo,
                                                                   final boolean includeConcreteInfo,
@@ -916,12 +934,12 @@ public class JungGraphConnection
         }
 
         // logger.info( "Filtering %d edges...", edges.size() );
-        final Set<ProjectRelationship<?>> rels = new HashSet<ProjectRelationship<?>>( edges.size() );
+        final Set<ProjectRelationship<?, ?>> rels = new HashSet<ProjectRelationship<?, ?>>( edges.size() );
 
         final List<RelationshipType> typeList = Arrays.asList( types );
         Collections.sort( typeList );
 
-        for ( final ProjectRelationship<?> rel : edges )
+        for ( final ProjectRelationship<?, ?> rel : edges )
         {
             if ( !typeList.isEmpty() && !typeList.contains( rel.getType() ) )
             {
@@ -957,7 +975,7 @@ public class JungGraphConnection
 
     @Deprecated
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
                                                                  final boolean includeManagedInfo,
                                                                  final RelationshipType... types )
     {
@@ -965,7 +983,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
                                                                  final boolean includeManagedInfo,
                                                                  final boolean includeConcreteInfo,
                                                                  final RelationshipType... types )
@@ -986,10 +1004,10 @@ public class JungGraphConnection
     public void deleteRelationshipsDeclaredBy( final ProjectVersionRef ref )
         throws RelationshipGraphConnectionException
     {
-        final Collection<ProjectRelationship<?>> edges = graph.getOutEdges( ref.asProjectVersionRef() );
+        final Collection<ProjectRelationship<?, ?>> edges = graph.getOutEdges( ref.asProjectVersionRef() );
         if ( edges != null )
         {
-            for ( final ProjectRelationship<?> rel : edges )
+            for ( final ProjectRelationship<?, ?> rel : edges )
             {
                 graph.removeEdge( rel );
             }
@@ -1024,10 +1042,10 @@ public class JungGraphConnection
         final ProjectRef targetGA = target.asProjectRef();
 
         final JungGraphPath jungpath = (JungGraphPath) path;
-        for ( final ProjectRelationship<?> ref : jungpath )
+        for ( final ProjectRelationship<?, ?> ref : jungpath )
         {
-            final Collection<ProjectRelationship<?>> outEdges = graph.getOutEdges( ref.getDeclaring() );
-            for ( final ProjectRelationship<?> edge : outEdges )
+            final Collection<ProjectRelationship<?, ?>> outEdges = graph.getOutEdges( ref.getDeclaring() );
+            for ( final ProjectRelationship<?, ?> edge : outEdges )
             {
                 if ( edge.isManaged() && type == edge.getType() && targetGA.equals( edge.getTarget() ) )
                 {
@@ -1041,7 +1059,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public GraphPath<?> createPath( final ProjectRelationship<?>... rels )
+    public GraphPath<?> createPath( final ProjectRelationship<?, ?>... rels )
     {
         if ( rels.length > 0 )
         {
@@ -1060,7 +1078,7 @@ public class JungGraphConnection
     }
 
     @Override
-    public GraphPath<?> createPath( final GraphPath<?> parent, final ProjectRelationship<?> child )
+    public GraphPath<?> createPath( final GraphPath<?> parent, final ProjectRelationship<?, ?> child )
     {
         try
         {
@@ -1150,7 +1168,7 @@ public class JungGraphConnection
 
         final JungGraphPath gp = (JungGraphPath) path;
         final List<ProjectVersionRef> refs = new ArrayList<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : gp )
+        for ( final ProjectRelationship<?, ?> rel : gp )
         {
             if ( refs.isEmpty() )
             {

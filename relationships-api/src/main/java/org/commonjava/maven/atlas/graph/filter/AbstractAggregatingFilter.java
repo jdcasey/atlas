@@ -58,7 +58,7 @@ public abstract class AbstractAggregatingFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         final Set<ProjectRelationshipFilter> childFilters = new LinkedHashSet<ProjectRelationshipFilter>();
         for ( final ProjectRelationshipFilter filter : getFilters() )

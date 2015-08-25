@@ -31,8 +31,8 @@ public class ImpactTraversal
     extends AbstractTraversal
 {
 
-    private final Map<ProjectVersionRef, Set<List<ProjectRelationship<?>>>> impactedPaths =
-        new HashMap<ProjectVersionRef, Set<List<ProjectRelationship<?>>>>();
+    private final Map<ProjectVersionRef, Set<List<ProjectRelationship<?, ?>>>> impactedPaths =
+        new HashMap<ProjectVersionRef, Set<List<ProjectRelationship<?, ?>>>>();
 
     private final boolean includeManagedInfo;
 
@@ -46,7 +46,7 @@ public class ImpactTraversal
         this.includeManagedInfo = includeManagedInfo;
         for ( final ProjectVersionRef target : targets )
         {
-            impactedPaths.put( target, new HashSet<List<ProjectRelationship<?>>>() );
+            impactedPaths.put( target, new HashSet<List<ProjectRelationship<?, ?>>>() );
         }
     }
 
@@ -60,17 +60,17 @@ public class ImpactTraversal
         this.includeManagedInfo = includeManagedInfo;
         for ( final ProjectVersionRef target : targets )
         {
-            impactedPaths.put( target, new HashSet<List<ProjectRelationship<?>>>() );
+            impactedPaths.put( target, new HashSet<List<ProjectRelationship<?, ?>>>() );
         }
     }
 
-    public Map<ProjectVersionRef, Set<List<ProjectRelationship<?>>>> getImpactedPaths()
+    public Map<ProjectVersionRef, Set<List<ProjectRelationship<?, ?>>>> getImpactedPaths()
     {
         return impactedPaths;
     }
 
     @Override
-    public boolean traverseEdge( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean traverseEdge( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         if ( !preCheck( relationship, path ) )
         {
@@ -79,8 +79,8 @@ public class ImpactTraversal
 
         final ProjectVersionRef target = relationship.getTarget()
                                                      .asProjectVersionRef();
-        final Set<List<ProjectRelationship<?>>> paths = impactedPaths.get( target );
-        final ArrayList<ProjectRelationship<?>> p = new ArrayList<ProjectRelationship<?>>( path );
+        final Set<List<ProjectRelationship<?, ?>>> paths = impactedPaths.get( target );
+        final ArrayList<ProjectRelationship<?, ?>> p = new ArrayList<ProjectRelationship<?, ?>>( path );
         p.add( relationship );
 
         paths.add( p );
@@ -90,7 +90,7 @@ public class ImpactTraversal
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         if ( !includeManagedInfo )
         {
@@ -106,7 +106,7 @@ public class ImpactTraversal
             }
         }
 
-        final Set<List<ProjectRelationship<?>>> paths = impactedPaths.get( relationship.getTarget()
+        final Set<List<ProjectRelationship<?, ?>>> paths = impactedPaths.get( relationship.getTarget()
                                                                                        .asProjectVersionRef() );
         return !( paths != null && paths.isEmpty() );
 

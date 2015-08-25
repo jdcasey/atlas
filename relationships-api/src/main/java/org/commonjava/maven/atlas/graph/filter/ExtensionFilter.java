@@ -15,9 +15,9 @@
  */
 package org.commonjava.maven.atlas.graph.filter;
 
-import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.rel.RelationshipType;
+import org.commonjava.maven.atlas.graph.rel.SimpleExtensionRelationship;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 
 // TODO: Do we need to consider excludes in the extensions?
@@ -36,9 +36,9 @@ public class ExtensionFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
-        if ( parent instanceof ExtensionRelationship )
+        if ( parent instanceof SimpleExtensionRelationship )
         {
             return new OrFilter( new DependencyFilter( DependencyScope.runtime ), ParentFilter.EXCLUDE_TERMINAL_PARENTS );
         }

@@ -39,7 +39,7 @@ public class PluginOnlyFilter
     }
 
     @Override
-    public boolean doAccept( final ProjectRelationship<?> rel )
+    public boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
         final PluginRelationship pr = (PluginRelationship) rel;
         if ( includeManagedRelationships() && pr.isManaged() )
@@ -55,7 +55,7 @@ public class PluginOnlyFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         return NoneFilter.INSTANCE;
     }

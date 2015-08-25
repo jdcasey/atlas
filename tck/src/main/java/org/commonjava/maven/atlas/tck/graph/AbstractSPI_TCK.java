@@ -15,10 +15,12 @@
  */
 package org.commonjava.maven.atlas.tck.graph;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.ServiceLoader;
 
 import org.commonjava.maven.atlas.graph.RelationshipGraph;
 import org.commonjava.maven.atlas.graph.RelationshipGraphFactory;
@@ -26,9 +28,11 @@ import org.commonjava.maven.atlas.graph.ViewParams;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionFactory;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.tck.graph.testutil.TCKDriver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,29 @@ public abstract class AbstractSPI_TCK
 
     @Rule
     public TestName naming = new TestName();
+
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
+
+    private TCKDriver driver;
+
+    @Before
+    public void before()
+            throws Exception
+    {
+        driver = ServiceLoader.load( TCKDriver.class ).iterator().next();
+        driver.setup( temp );
+    }
+
+    @After
+    public void after()
+            throws IOException
+    {
+        if ( driver != null )
+        {
+            driver.close();
+        }
+    }
 
     protected URI sourceURI()
         throws URISyntaxException
@@ -61,17 +88,20 @@ public abstract class AbstractSPI_TCK
 
     protected final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    protected abstract RelationshipGraphConnectionFactory connectionFactory()
-        throws Exception;
-
     private RelationshipGraphFactory graphFactory;
+
+    protected final RelationshipGraphConnectionFactory connectionFactory()
+            throws Exception
+    {
+        return driver.getConnectionFactory();
+    }
 
     protected final RelationshipGraphFactory graphFactory()
         throws Exception
     {
         if ( graphFactory == null )
         {
-            graphFactory = new RelationshipGraphFactory( connectionFactory() );
+            graphFactory = new RelationshipGraphFactory( driver.getConnectionFactory() );
         }
 
         return graphFactory;

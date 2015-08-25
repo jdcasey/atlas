@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class RelationshipPathComparator
-    implements Comparator<List<ProjectRelationship<?>>>
+    implements Comparator<List<ProjectRelationship<?, ?>>>
 {
 
     public static RelationshipPathComparator INSTANCE = new RelationshipPathComparator();
@@ -34,7 +34,7 @@ public class RelationshipPathComparator
     }
 
     @Override
-    public int compare( final List<ProjectRelationship<?>> one, final List<ProjectRelationship<?>> two )
+    public int compare( final List<ProjectRelationship<?, ?>> one, final List<ProjectRelationship<?, ?>> two )
     {
         Logger logger = LoggerFactory.getLogger( getClass() );
         logger.debug("Comparing:\nOne: {}\nTwo: {}", one, two);
@@ -71,12 +71,12 @@ public class RelationshipPathComparator
         return 0;
     }
 
-    private int compareRels( final ProjectRelationship<?> one, final ProjectRelationship<?> two )
+    private int compareRels( final ProjectRelationship<?, ?> one, final ProjectRelationship<?, ?> two )
     {
         return comp.compare( one, two );
     }
 
-    private int compareRelTypes( final ProjectRelationship<?> one, final ProjectRelationship<?> two )
+    private int compareRelTypes( final ProjectRelationship<?, ?> one, final ProjectRelationship<?, ?> two )
     {
         return one.getType()
                   .ordinal() - two.getType()

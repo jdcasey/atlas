@@ -35,13 +35,13 @@ public class BomFilter
     }
 
     @Override
-    public boolean doAccept( final ProjectRelationship<?> rel )
+    public boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
         return true;
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         return this;
     }

@@ -65,7 +65,7 @@ public final class GraphPathInfo
         return mutator;
     }
 
-    public ProjectRelationship<?> selectRelationship( ProjectRelationship<?> next, final GraphPath<?> path )
+    public ProjectRelationship<?, ?> selectRelationship( ProjectRelationship<?, ?> next, final GraphPath<?> path )
     {
         if ( filter != null && !filter.accept( next ) )
         {
@@ -80,7 +80,7 @@ public final class GraphPathInfo
         return next;
     }
 
-    public GraphPathInfo getChildPathInfo( final ProjectRelationship<?> rel )
+    public GraphPathInfo getChildPathInfo( final ProjectRelationship<?, ?> rel )
     {
         final ProjectRelationshipFilter nextFilter = filter == null ? null : filter.getChildFilter( rel );
         final GraphMutator nextMutator = mutator == null ? null : mutator.getMutatorFor( rel, connection, params );

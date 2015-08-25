@@ -28,11 +28,10 @@ import java.util.Stack;
 
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.SimpleDependencyRelationship;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 
 public class ListPrinter
 {
@@ -54,14 +53,14 @@ public class ListPrinter
     }
 
     public void printStructure( final ProjectVersionRef from,
-                                final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                                final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
                                 final Map<String, Set<ProjectVersionRef>> labels, PrintWriter writer )
     {
         printStructure( from, links, null, null, labels, writer );
     }
 
     public void printStructure( final ProjectVersionRef from,
-                                final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links, final String header,
+                                final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links, final String header,
                                 final String footer, final Map<String, Set<ProjectVersionRef>> labels,
                                 PrintWriter writer )
     {
@@ -95,17 +94,17 @@ public class ListPrinter
     }
 
     private void printLinks( final ProjectVersionRef from, final Set<String> lines,
-                             final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                             final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
                              final Map<String, Set<ProjectVersionRef>> labels, final Set<ProjectRef> excluded,
                              final Stack<ProjectVersionRef> inPath )
     {
         inPath.push( from );
 
-        final List<ProjectRelationship<?>> outbound = links.get( from );
+        final List<ProjectRelationship<?, ?>> outbound = links.get( from );
         if ( outbound != null )
         {
             StringWriter sw;
-            for ( final ProjectRelationship<?> out : outbound )
+            for ( final ProjectRelationship<?, ?> out : outbound )
             {
                 sw = new StringWriter();
 
@@ -134,7 +133,7 @@ public class ListPrinter
                                       .asProjectRef() ) )
                 {
                     Set<ProjectRef> newExcluded = null;
-                    if ( out instanceof DependencyRelationship )
+                    if ( out instanceof SimpleDependencyRelationship )
                     {
                         final Set<ProjectRef> excludes = ( (DependencyRelationship) out ).getExcludes();
                         if ( excludes != null && !excludes.isEmpty() )

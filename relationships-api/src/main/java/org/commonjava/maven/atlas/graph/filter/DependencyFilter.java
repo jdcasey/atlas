@@ -21,10 +21,13 @@ import java.util.Set;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.rel.RelationshipType;
+import org.commonjava.maven.atlas.graph.rel.SimpleDependencyRelationship;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ScopeTransitivity;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DependencyFilter
     extends AbstractTypedFilter
@@ -77,11 +80,14 @@ public class DependencyFilter
     }
 
     @Override
-    public boolean doAccept( final ProjectRelationship<?> rel )
+    public boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
+//        Logger logger = LoggerFactory.getLogger( getClass() );
+//        logger.debug( "CHECK accept: {}", rel);
         final DependencyRelationship dr = (DependencyRelationship) rel;
         if ( RelationshipUtils.isExcluded( dr.getTarget(), excludes ) )
         {
+//            logger.debug( "NO (excluded)" );
             return false;
         }
 
@@ -89,28 +95,33 @@ public class DependencyFilter
         {
             if ( useImpliedScopes && !scope.implies( dr.getScope() ) )
             {
+//                logger.debug( "NO (wrong implied scope)" );
                 return false;
             }
             else if ( !useImpliedScopes && scope != dr.getScope() )
             {
+//                logger.debug( "NO (wrong direct scope)" );
                 return false;
             }
         }
 
         if ( !includeManagedRelationships() && dr.isManaged() )
         {
+//            logger.debug( "NO (excluding managed)" );
             return false;
         }
         else if ( !includeConcreteRelationships() && !dr.isManaged() )
         {
+//            logger.debug( "NO (excluding concrete)" );
             return false;
         }
 
+//        logger.debug( "YES" );
         return true;
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         DependencyRelationship dr = null;
         if ( ( parent instanceof DependencyRelationship ) )

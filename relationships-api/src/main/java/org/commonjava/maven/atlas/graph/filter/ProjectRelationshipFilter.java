@@ -38,7 +38,7 @@ public interface ProjectRelationshipFilter
      * @param rel The relationship in question
      * @return true to allow traversal, false otherwise.
      */
-    boolean accept( ProjectRelationship<?> rel );
+    boolean accept( ProjectRelationship<?, ?> rel );
 
     /**
      * Return the filter used to handle the next wave of relationships after the 
@@ -50,7 +50,7 @@ public interface ProjectRelationshipFilter
      * @return This instance WHENEVER POSSIBLE, but possibly a different filter 
      * if the relationship demands a shift in logic.
      */
-    ProjectRelationshipFilter getChildFilter( ProjectRelationship<?> parent );
+    ProjectRelationshipFilter getChildFilter( ProjectRelationship<?, ?> parent );
 
     /**
      * Retrieve a human-readable string that uniquely identifies the logic in this filter, 

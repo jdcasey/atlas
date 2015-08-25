@@ -32,42 +32,42 @@ import org.commonjava.maven.atlas.graph.rel.RelationshipComparator;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 
 public class EProjectCycle
-    implements Iterable<ProjectRelationship<?>>, EProjectRelationshipCollection
+    implements Iterable<ProjectRelationship<?, ?>>, EProjectRelationshipCollection
 {
 
     private static final long serialVersionUID = 1L;
 
-    private List<ProjectRelationship<?>> relationships = new ArrayList<ProjectRelationship<?>>();
+    private List<ProjectRelationship<?, ?>> relationships = new ArrayList<ProjectRelationship<?, ?>>();
 
     public static final class Builder
     {
-        private final List<ProjectRelationship<?>> participants;
+        private final List<ProjectRelationship<?, ?>> participants;
 
-        public Builder( final ProjectRelationship<?>... rels )
+        public Builder( final ProjectRelationship<?, ?>... rels )
         {
-            participants = new ArrayList<ProjectRelationship<?>>( Arrays.asList( rels ) );
+            participants = new ArrayList<ProjectRelationship<?, ?>>( Arrays.asList( rels ) );
         }
 
-        public Builder( final List<ProjectRelationship<?>> rels )
+        public Builder( final List<ProjectRelationship<?, ?>> rels )
         {
-            participants = new ArrayList<ProjectRelationship<?>>( rels );
+            participants = new ArrayList<ProjectRelationship<?, ?>>( rels );
         }
 
         public Builder( final Builder builder )
         {
-            participants = new ArrayList<ProjectRelationship<?>>( builder.participants );
+            participants = new ArrayList<ProjectRelationship<?, ?>>( builder.participants );
         }
 
         public Builder( final Builder builder, final int start )
         {
-            participants = new ArrayList<ProjectRelationship<?>>( builder.participants );
+            participants = new ArrayList<ProjectRelationship<?, ?>>( builder.participants );
             for ( int i = 0; i < start; i++ )
             {
                 participants.remove( 0 );
             }
         }
 
-        public Builder with( final ProjectRelationship<?> rel )
+        public Builder with( final ProjectRelationship<?, ?> rel )
         {
             participants.add( rel );
             return this;
@@ -89,7 +89,7 @@ public class EProjectCycle
             return build().indexOf( ref );
         }
 
-        public int indexOf( final ProjectRelationship<?> rel )
+        public int indexOf( final ProjectRelationship<?, ?> rel )
         {
             return build().indexOf( rel );
         }
@@ -99,7 +99,7 @@ public class EProjectCycle
             return build().contains( ref );
         }
 
-        public boolean contains( final ProjectRelationship<?> rel )
+        public boolean contains( final ProjectRelationship<?, ?> rel )
         {
             return build().contains( rel );
         }
@@ -107,19 +107,19 @@ public class EProjectCycle
 
     public EProjectCycle(){}
 
-    public EProjectCycle( final List<ProjectRelationship<?>> cycle )
+    public EProjectCycle( final List<ProjectRelationship<?, ?>> cycle )
     {
-        this.relationships = new ArrayList<ProjectRelationship<?>>( cycle );
+        this.relationships = new ArrayList<ProjectRelationship<?, ?>>( cycle );
     }
 
-    public boolean contains( final ProjectRelationship<?> rel )
+    public boolean contains( final ProjectRelationship<?, ?> rel )
     {
         return relationships.contains( rel );
     }
 
     public boolean contains( final ProjectVersionRef ref )
     {
-        for ( final ProjectRelationship<?> rel : relationships )
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             if ( rel.getDeclaring()
                     .equals( ref ) )
@@ -131,7 +131,7 @@ public class EProjectCycle
         return false;
     }
 
-    public int indexOf( final ProjectRelationship<?> rel )
+    public int indexOf( final ProjectRelationship<?, ?> rel )
     {
         return relationships.indexOf( rel );
     }
@@ -141,7 +141,7 @@ public class EProjectCycle
         int targetIdx = -1;
         for ( int i = 0; i < relationships.size(); i++ )
         {
-            final ProjectRelationship<?> rel = relationships.get( i );
+            final ProjectRelationship<?, ?> rel = relationships.get( i );
             if ( rel.getDeclaring()
                     .equals( ref ) )
             {
@@ -163,30 +163,30 @@ public class EProjectCycle
     }
 
     @Override
-    public Iterator<ProjectRelationship<?>> iterator()
+    public Iterator<ProjectRelationship<?, ?>> iterator()
     {
         return relationships.iterator();
     }
 
     @Override
-    public Collection<ProjectRelationship<?>> getAllRelationships()
+    public Collection<ProjectRelationship<?, ?>> getAllRelationships()
     {
-        final Collection<ProjectRelationship<?>> rels = getExactAllRelationships();
+        final Collection<ProjectRelationship<?, ?>> rels = getExactAllRelationships();
         filterTerminalParents( rels );
 
         return rels;
     }
 
     @Override
-    public Collection<ProjectRelationship<?>> getExactAllRelationships()
+    public Collection<ProjectRelationship<?, ?>> getExactAllRelationships()
     {
-        return new ArrayList<ProjectRelationship<?>>( relationships );
+        return new ArrayList<ProjectRelationship<?, ?>>( relationships );
     }
 
     public Set<ProjectVersionRef> getAllParticipatingProjects()
     {
         final Set<ProjectVersionRef> refs = new HashSet<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : relationships )
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             refs.add( rel.getDeclaring() );
             refs.add( rel.getTarget()
@@ -196,12 +196,12 @@ public class EProjectCycle
         return refs;
     }
 
-    public List<ProjectRelationship<?>> getRelationships()
+    public List<ProjectRelationship<?, ?>> getRelationships()
     {
         return relationships;
     }
 
-    public void setRelationships( final List<ProjectRelationship<?>> relationships )
+    public void setRelationships( final List<ProjectRelationship<?, ?>> relationships )
     {
         this.relationships = relationships;
     }
@@ -218,7 +218,7 @@ public class EProjectCycle
         final int prime = 31;
         int result = 1;
 
-        final List<ProjectRelationship<?>> sorted = new ArrayList<ProjectRelationship<?>>( relationships );
+        final List<ProjectRelationship<?, ?>> sorted = new ArrayList<ProjectRelationship<?, ?>>( relationships );
         Collections.sort( sorted, RelationshipComparator.INSTANCE );
 
         result = prime * result + sorted.hashCode();
@@ -251,10 +251,10 @@ public class EProjectCycle
         else
         {
 
-            final Set<ProjectRelationship<?>> cycle = new HashSet<ProjectRelationship<?>>( this.relationships );
-            final Set<ProjectRelationship<?>> otherCycle = new HashSet<ProjectRelationship<?>>( other.relationships );
+            final Set<ProjectRelationship<?, ?>> cycle = new HashSet<ProjectRelationship<?, ?>>( this.relationships );
+            final Set<ProjectRelationship<?, ?>> otherCycle = new HashSet<ProjectRelationship<?, ?>>( other.relationships );
 
-            for ( final ProjectRelationship<?> rel : cycle )
+            for ( final ProjectRelationship<?, ?> rel : cycle )
             {
                 if ( !otherCycle.contains( rel ) )
                 {

@@ -28,6 +28,11 @@
   <artifactId>atlas-driver-neo4j-embedded</artifactId>
 
   <name>Atlas :: Maven Project-Graph :: Embedded Neo4J API</name>
+
+  <properties>
+    <test-forkCount>1C</test-forkCount>
+    <test-redirectOutput>true</test-redirectOutput>
+  </properties>
   
   <dependencies>
     <dependency>
@@ -37,10 +42,6 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -41,7 +41,7 @@ public class OrFilter
     }
 
     @Override
-    public boolean accept( final ProjectRelationship<?> rel )
+    public boolean accept( final ProjectRelationship<?, ?> rel )
     {
         boolean accepted = false;
         for ( final ProjectRelationshipFilter filter : getFilters() )

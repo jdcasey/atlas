@@ -26,11 +26,11 @@ public interface RelationshipGraphListener
     void projectError( RelationshipGraph graph, ProjectVersionRef ref, Throwable error )
         throws RelationshipGraphException;
 
-    void storing( RelationshipGraph graph, Collection<? extends ProjectRelationship<?>> relationships )
+    void storing( RelationshipGraph graph, Collection<? extends ProjectRelationship<?, ?>> relationships )
         throws RelationshipGraphException;
 
-    void stored( RelationshipGraph graph, Collection<? extends ProjectRelationship<?>> relationships,
-                 Collection<ProjectRelationship<?>> rejected )
+    void stored( RelationshipGraph graph, Collection<? extends ProjectRelationship<?, ?>> relationships,
+                 Collection<ProjectRelationship<?, ?>> rejected )
         throws RelationshipGraphException;
 
     void closing( RelationshipGraph graph )

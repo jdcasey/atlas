@@ -30,9 +30,9 @@ public interface RelationshipGraphTraversal
     void endTraverse( RelationshipGraph graph )
         throws RelationshipGraphConnectionException;
 
-    boolean traverseEdge( ProjectRelationship<?> relationship, List<ProjectRelationship<?>> path );
+    boolean traverseEdge( ProjectRelationship<?, ?> relationship, List<ProjectRelationship<?, ?>> path );
 
-    void edgeTraversed( ProjectRelationship<?> relationship, List<ProjectRelationship<?>> path );
+    void edgeTraversed( ProjectRelationship<?, ?> relationship, List<ProjectRelationship<?, ?>> path );
 
-    boolean preCheck( ProjectRelationship<?> relationship, List<ProjectRelationship<?>> path );
+    boolean preCheck( ProjectRelationship<?, ?> relationship, List<ProjectRelationship<?, ?>> path );
 }

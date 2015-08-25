@@ -61,7 +61,7 @@ public interface RelationshipGraphConnection
      * 
      * @return The set of relationships that were NOT added because they introduce cycles. NEVER null, but maybe empty.
      */
-    Set<ProjectRelationship<?>> addRelationships( ProjectRelationship<?>... rel )
+    Set<ProjectRelationship<?, ?>> addRelationships( ProjectRelationship<?, ?>... rel )
         throws RelationshipGraphConnectionException;
 
     void addProjectError( ProjectVersionRef ref, String error )
@@ -89,15 +89,15 @@ public interface RelationshipGraphConnection
 
     String getProjectError( ProjectVersionRef ref );
 
-    Collection<? extends ProjectRelationship<?>> getRelationshipsDeclaredBy( ViewParams params, ProjectVersionRef root );
+    Collection<? extends ProjectRelationship<?, ?>> getRelationshipsDeclaredBy( ViewParams params, ProjectVersionRef root );
 
-    Collection<? extends ProjectRelationship<?>> getRelationshipsTargeting( ViewParams params, ProjectVersionRef root );
+    Collection<? extends ProjectRelationship<?, ?>> getRelationshipsTargeting( ViewParams params, ProjectVersionRef root );
 
-    Collection<ProjectRelationship<?>> getAllRelationships( ViewParams params );
+    Collection<ProjectRelationship<?, ?>> getAllRelationships( ViewParams params );
 
-    Set<List<ProjectRelationship<?>>> getAllPathsTo( ViewParams params, ProjectVersionRef... projectVersionRefs );
+    Set<List<ProjectRelationship<?, ?>>> getAllPathsTo( ViewParams params, ProjectVersionRef... projectVersionRefs );
 
-    boolean introducesCycle( ViewParams params, ProjectRelationship<?> rel );
+    boolean introducesCycle( ViewParams params, ProjectRelationship<?, ?> rel );
 
     Set<ProjectVersionRef> getAllProjects( ViewParams params );
 
@@ -107,7 +107,7 @@ public interface RelationshipGraphConnection
 
     boolean containsProject( ViewParams params, ProjectVersionRef ref );
 
-    boolean containsRelationship( ViewParams params, ProjectRelationship<?> rel );
+    boolean containsRelationship( ViewParams params, ProjectRelationship<?, ?> rel );
 
     boolean isMissing( ViewParams params, ProjectVersionRef project );
 
@@ -123,7 +123,7 @@ public interface RelationshipGraphConnection
 
     Set<EProjectCycle> getCycles( ViewParams params );
 
-    boolean isCycleParticipant( ViewParams params, ProjectRelationship<?> rel );
+    boolean isCycleParticipant( ViewParams params, ProjectRelationship<?, ?> rel );
 
     boolean isCycleParticipant( ViewParams params, ProjectVersionRef ref );
 
@@ -134,18 +134,18 @@ public interface RelationshipGraphConnection
     Set<ProjectVersionRef> getProjectsWithMetadata( ViewParams params, String key );
 
     @Deprecated
-    Set<ProjectRelationship<?>> getDirectRelationshipsFrom( ViewParams params, ProjectVersionRef from,
+    Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( ViewParams params, ProjectVersionRef from,
                                                             boolean includeManagedInfo, RelationshipType... types );
 
     @Deprecated
-    Set<ProjectRelationship<?>> getDirectRelationshipsTo( ViewParams params, ProjectVersionRef to,
+    Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( ViewParams params, ProjectVersionRef to,
                                                           boolean includeManagedInfo, RelationshipType... types );
 
-    Set<ProjectRelationship<?>> getDirectRelationshipsFrom( ViewParams params, ProjectVersionRef from,
+    Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( ViewParams params, ProjectVersionRef from,
                                                             boolean includeManagedInfo, boolean includeConcreteInfo,
                                                             RelationshipType... types );
 
-    Set<ProjectRelationship<?>> getDirectRelationshipsTo( ViewParams params, ProjectVersionRef to,
+    Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( ViewParams params, ProjectVersionRef to,
                                                           boolean includeManagedInfo, boolean includeConcreteInfo,
                                                           RelationshipType... types );
 
@@ -155,9 +155,9 @@ public interface RelationshipGraphConnection
 
     ProjectVersionRef getManagedTargetFor( ProjectVersionRef target, GraphPath<?> path, RelationshipType type );
 
-    GraphPath<?> createPath( ProjectRelationship<?>... relationships );
+    GraphPath<?> createPath( ProjectRelationship<?, ?>... relationships );
 
-    GraphPath<?> createPath( GraphPath<?> parent, ProjectRelationship<?> relationship );
+    GraphPath<?> createPath( GraphPath<?> parent, ProjectRelationship<?, ?> relationship );
 
     boolean registerView( ViewParams params );
 

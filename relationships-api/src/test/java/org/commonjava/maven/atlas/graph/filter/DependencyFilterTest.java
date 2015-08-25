@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
+import org.commonjava.maven.atlas.graph.rel.SimpleDependencyRelationship;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
@@ -47,7 +48,7 @@ public class DependencyFilterTest
     {
         final DependencyFilter filter = new DependencyFilter( DependencyScope.runtime );
         final DependencyRelationship rel =
-            new DependencyRelationship( testURI(), new SimpleProjectVersionRef( "g", "a", "1" ),
+            new SimpleDependencyRelationship( testURI(), new SimpleProjectVersionRef( "g", "a", "1" ),
                                         new SimpleArtifactRef( "g", "b", "2", "jar", null, false ), DependencyScope.test, 0,
                                         false );
 

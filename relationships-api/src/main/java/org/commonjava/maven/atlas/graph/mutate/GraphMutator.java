@@ -50,7 +50,7 @@ public interface GraphMutator
      * @return The alternative relationship, or the given one if no mutation 
      * takes place.
      */
-    ProjectRelationship<?> selectFor( ProjectRelationship<?> rel, GraphPath<?> path,
+    ProjectRelationship<?, ?> selectFor( ProjectRelationship<?, ?> rel, GraphPath<?> path,
                                       RelationshipGraphConnection connection, ViewParams params );
 
     /**
@@ -66,7 +66,7 @@ public interface GraphMutator
      * whether to proceed should be handled via {@link ProjectRelationshipFilter}, 
      * not here.
      */
-    GraphMutator getMutatorFor( ProjectRelationship<?> rel, RelationshipGraphConnection connection, ViewParams params );
+    GraphMutator getMutatorFor( ProjectRelationship<?, ?> rel, RelationshipGraphConnection connection, ViewParams params );
 
     /**
      * Retrieve a human-readable string that uniquely identifies the logic in this mutator, 

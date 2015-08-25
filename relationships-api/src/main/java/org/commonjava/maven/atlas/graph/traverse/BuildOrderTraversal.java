@@ -61,8 +61,8 @@ public class BuildOrderTraversal
     }
 
     @Override
-    protected boolean shouldTraverseEdge( final ProjectRelationship<?> relationship,
-                                          final List<ProjectRelationship<?>> path )
+    protected boolean shouldTraverseEdge( final ProjectRelationship<?, ?> relationship,
+                                          final List<ProjectRelationship<?, ?>> path )
     {
         if ( !verifyProjectsAllowed( relationship, path ) )
         {
@@ -96,8 +96,8 @@ public class BuildOrderTraversal
         return true;
     }
 
-    private boolean verifyProjectsAllowed( final ProjectRelationship<?> relationship,
-                                           final List<ProjectRelationship<?>> path )
+    private boolean verifyProjectsAllowed( final ProjectRelationship<?, ?> relationship,
+                                           final List<ProjectRelationship<?, ?>> path )
     {
         if ( allowedProjects == null )
         {
@@ -113,7 +113,7 @@ public class BuildOrderTraversal
             return false;
         }
 
-        for ( final ProjectRelationship<?> rel : path )
+        for ( final ProjectRelationship<?, ?> rel : path )
         {
             if ( !verifyRelationshipProjectsAllowed( rel ) )
             {
@@ -124,7 +124,7 @@ public class BuildOrderTraversal
         return true;
     }
 
-    private boolean verifyRelationshipProjectsAllowed( final ProjectRelationship<?> relationship )
+    private boolean verifyRelationshipProjectsAllowed( final ProjectRelationship<?, ?> relationship )
     {
         return allowedProjects == null
             || ( allowedProjects.contains( relationship.getDeclaring() ) && allowedProjects.contains( relationship.getTarget() ) );
@@ -146,7 +146,7 @@ public class BuildOrderTraversal
                 ProjectRelationshipFilter filter = getRootFilter();
 
                 boolean include = true;
-                for ( final ProjectRelationship<?> rel : eProjectCycle )
+                for ( final ProjectRelationship<?, ?> rel : eProjectCycle )
                 {
                     if ( !filter.accept( rel ) )
                     {

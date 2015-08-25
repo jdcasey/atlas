@@ -45,7 +45,7 @@ extends AbstractTraversal
 
     private final Map<ProjectRef, OrFilter> cache = new HashMap<ProjectRef, OrFilter>();
 
-    private final Set<List<ProjectRelationship<?>>> paths = new HashSet<List<ProjectRelationship<?>>>();
+    private final Set<List<ProjectRelationship<?, ?>>> paths = new HashSet<List<ProjectRelationship<?, ?>>>();
 
     public PathsTraversal( final ProjectRelationshipFilter filter, final Set<? extends ProjectRef> toGas )
     {
@@ -54,7 +54,7 @@ extends AbstractTraversal
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         final ProjectVersionRef declaring = relationship.getDeclaring().asProjectVersionRef();
         if ( path.isEmpty() || path.get( path.size() - 1 ).getTarget().asProjectVersionRef().equals( declaring ) )
@@ -111,7 +111,7 @@ extends AbstractTraversal
 
                 if ( to.contains( tRef ) )
                 {
-                    final List<ProjectRelationship<?>> realPath = new ArrayList<ProjectRelationship<?>>( path );
+                    final List<ProjectRelationship<?, ?>> realPath = new ArrayList<ProjectRelationship<?, ?>>( path );
                     realPath.add( relationship );
                     paths.add( realPath );
                 }
@@ -123,7 +123,7 @@ extends AbstractTraversal
         return false;
     }
 
-    public Set<List<ProjectRelationship<?>>> getDiscoveredPaths()
+    public Set<List<ProjectRelationship<?, ?>>> getDiscoveredPaths()
     {
         return paths;
     }

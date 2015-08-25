@@ -35,7 +35,7 @@ public abstract class AbstractRelationshipGraphListener
     public abstract boolean equals( Object other );
 
     @Override
-    public void storing( final RelationshipGraph graph, final Collection<? extends ProjectRelationship<?>> relationships )
+    public void storing( final RelationshipGraph graph, final Collection<? extends ProjectRelationship<?, ?>> relationships )
         throws RelationshipGraphException
     {
         // NOP
@@ -43,8 +43,8 @@ public abstract class AbstractRelationshipGraphListener
 
     @Override
     public void stored( final RelationshipGraph graph,
-                        final Collection<? extends ProjectRelationship<?>> relationships,
-                        final Collection<ProjectRelationship<?>> rejected )
+                        final Collection<? extends ProjectRelationship<?, ?>> relationships,
+                        final Collection<ProjectRelationship<?, ?>> rejected )
         throws RelationshipGraphException
     {
         // NOP

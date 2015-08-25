@@ -39,12 +39,12 @@ public abstract class AbstractTraversal
     }
 
     @Override
-    public void edgeTraversed( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public void edgeTraversed( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
     }
 
     @Override
-    public boolean traverseEdge( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean traverseEdge( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         return preCheck( relationship, path );
     }

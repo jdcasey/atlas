@@ -102,9 +102,9 @@ public class ViewUpdater
         }
     }
 
-    public boolean processAddedRelationships( final Map<Long, ProjectRelationship<?>> createdRelationshipsMap )
+    public boolean processAddedRelationships( final Map<Long, ProjectRelationship<?, ?>> createdRelationshipsMap )
     {
-        for ( final Entry<Long, ProjectRelationship<?>> entry : createdRelationshipsMap.entrySet() )
+        for ( final Entry<Long, ProjectRelationship<?, ?>> entry : createdRelationshipsMap.entrySet() )
         {
             final Long rid = entry.getKey();
             final Relationship add = admin.getRelationship( rid );

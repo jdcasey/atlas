@@ -77,7 +77,7 @@ public final class TraversalUtils
 
     public static boolean accepted( final Relationship r, final ViewParams view, final ConversionCache cache )
     {
-        final ProjectRelationship<?> rel = toProjectRelationship( r, cache );
+        final ProjectRelationship<?, ?> rel = toProjectRelationship( r, cache );
 
         debug( "Checking relationship for acceptance: {} ({})", r, rel );
 

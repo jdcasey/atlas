@@ -30,7 +30,7 @@ public interface Neo4JGraphConnection
     ExecutionResult executeFrom( String cypher, ProjectVersionRef... roots )
         throws RelationshipGraphConnectionException;
 
-    ExecutionResult executeFrom( String cypher, ProjectRelationship<?> rootRel )
+    ExecutionResult executeFrom( String cypher, ProjectRelationship<?, ?> rootRel )
         throws RelationshipGraphConnectionException;
 
     ExecutionResult execute( String cypher )
@@ -39,7 +39,7 @@ public interface Neo4JGraphConnection
     ExecutionResult executeFrom( String cypher, Map<String, Object> params, ProjectVersionRef... roots )
         throws RelationshipGraphConnectionException;
 
-    ExecutionResult executeFrom( String cypher, Map<String, Object> params, ProjectRelationship<?> rootRel )
+    ExecutionResult executeFrom( String cypher, Map<String, Object> params, ProjectRelationship<?, ?> rootRel )
         throws RelationshipGraphConnectionException;
 
     ExecutionResult execute( String cypher, Map<String, Object> params )

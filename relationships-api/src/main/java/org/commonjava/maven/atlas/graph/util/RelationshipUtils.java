@@ -34,17 +34,10 @@ import org.commonjava.maven.atlas.graph.filter.AbstractAggregatingFilter;
 import org.commonjava.maven.atlas.graph.filter.AbstractTypedFilter;
 import org.commonjava.maven.atlas.graph.filter.AnyFilter;
 import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
-import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.PluginDependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
-import org.commonjava.maven.atlas.graph.rel.RelationshipType;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import org.commonjava.maven.atlas.ident.util.JoinString;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.slf4j.Logger;
@@ -63,8 +56,20 @@ public final class RelationshipUtils
 
     public static URI ANY_SOURCE_URI;
 
+    public static URI TERMINAL_PARENT_SOURCE_URI;
+
     static
     {
+        final String uri = "atlas:terminal-parent";
+        try
+        {
+            TERMINAL_PARENT_SOURCE_URI = new URI( uri );
+        }
+        catch ( final URISyntaxException e )
+        {
+            throw new IllegalStateException( "Terminal-parent source URI constant is invalid: " + uri, e );
+        }
+
         try
         {
             ANY_SOURCE_URI = new URI( "any:any" );
@@ -116,18 +121,18 @@ public final class RelationshipUtils
         return false;
     }
 
-    public static Map<ProjectVersionRef, List<ProjectRelationship<?>>> mapByDeclaring( final Collection<? extends ProjectRelationship<?>> relationships )
+    public static Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> mapByDeclaring( final Collection<? extends ProjectRelationship<?, ?>> relationships )
     {
         final Logger logger = LoggerFactory.getLogger( RelationshipUtils.class );
         logger.debug( "Mapping {} relationships by declaring GAV:\n\n  {}\n\n", relationships.size(), new JoinString( "\n  ", relationships ) );
-        final Map<ProjectVersionRef, List<ProjectRelationship<?>>> result = new HashMap<ProjectVersionRef, List<ProjectRelationship<?>>>();
-        for ( final ProjectRelationship<?> rel : relationships )
+        final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> result = new HashMap<ProjectVersionRef, List<ProjectRelationship<?, ?>>>();
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             final ProjectVersionRef declaring = rel.getDeclaring();
-            List<ProjectRelationship<?>> outbound = result.get( declaring );
+            List<ProjectRelationship<?, ?>> outbound = result.get( declaring );
             if ( outbound == null )
             {
-                outbound = new ArrayList<ProjectRelationship<?>>();
+                outbound = new ArrayList<ProjectRelationship<?, ?>>();
                 result.put( rel.getDeclaring(), outbound );
             }
 
@@ -159,19 +164,19 @@ public final class RelationshipUtils
         }
     }
 
-    public static void filterTerminalParents( final Collection<? extends ProjectRelationship<?>> rels )
+    public static void filterTerminalParents( final Collection<? extends ProjectRelationship<?, ?>> rels )
     {
-        for ( final Iterator<? extends ProjectRelationship<?>> it = rels.iterator(); it.hasNext(); )
+        for ( final Iterator<? extends ProjectRelationship<?, ?>> it = rels.iterator(); it.hasNext(); )
         {
-            final ProjectRelationship<?> rel = it.next();
-            if ( ( rel instanceof ParentRelationship ) && ( (ParentRelationship) rel ).isTerminus() )
+            final ProjectRelationship<?, ?> rel = it.next();
+            if ( ( rel instanceof SimpleParentRelationship ) && ( (ParentRelationship) rel ).isTerminus() )
             {
                 it.remove();
             }
         }
     }
 
-    public static void filter( final Set<? extends ProjectRelationship<?>> rels, final RelationshipType... types )
+    public static void filter( final Set<? extends ProjectRelationship<?, ?>> rels, final RelationshipType... types )
     {
         if ( rels == null || rels.isEmpty() )
         {
@@ -184,9 +189,9 @@ public final class RelationshipUtils
         }
 
         Arrays.sort( types );
-        for ( final Iterator<? extends ProjectRelationship<?>> iterator = rels.iterator(); iterator.hasNext(); )
+        for ( final Iterator<? extends ProjectRelationship<?, ?>> iterator = rels.iterator(); iterator.hasNext(); )
         {
-            final ProjectRelationship<?> rel = iterator.next();
+            final ProjectRelationship<?, ?> rel = iterator.next();
             if ( Arrays.binarySearch( types, rel.getType() ) < 0 )
             {
                 iterator.remove();
@@ -194,7 +199,7 @@ public final class RelationshipUtils
         }
     }
 
-    public static void filter( final Set<? extends ProjectRelationship<?>> rels, final ProjectRelationshipFilter filter )
+    public static void filter( final Set<? extends ProjectRelationship<?, ?>> rels, final ProjectRelationshipFilter filter )
     {
         if ( filter == null || filter instanceof AnyFilter )
         {
@@ -206,9 +211,9 @@ public final class RelationshipUtils
             return;
         }
 
-        for ( final Iterator<? extends ProjectRelationship<?>> iterator = rels.iterator(); iterator.hasNext(); )
+        for ( final Iterator<? extends ProjectRelationship<?, ?>> iterator = rels.iterator(); iterator.hasNext(); )
         {
-            final ProjectRelationship<?> rel = iterator.next();
+            final ProjectRelationship<?, ?> rel = iterator.next();
             if ( !filter.accept( rel ) )
             {
                 iterator.remove();
@@ -216,15 +221,15 @@ public final class RelationshipUtils
         }
     }
 
-    public static Set<ProjectVersionRef> declarers( final ProjectRelationship<?>... relationships )
+    public static Set<ProjectVersionRef> declarers( final ProjectRelationship<?, ?>... relationships )
     {
         return declarers( Arrays.asList( relationships ) );
     }
 
-    public static Set<ProjectVersionRef> declarers( final Collection<? extends ProjectRelationship<?>> relationships )
+    public static Set<ProjectVersionRef> declarers( final Collection<? extends ProjectRelationship<?, ?>> relationships )
     {
         final Set<ProjectVersionRef> results = new HashSet<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : relationships )
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             results.add( rel.getDeclaring() );
         }
@@ -232,12 +237,12 @@ public final class RelationshipUtils
         return results;
     }
 
-    public static Set<ProjectVersionRef> targets( final ProjectRelationship<?>... relationships )
+    public static Set<ProjectVersionRef> targets( final ProjectRelationship<?, ?>... relationships )
     {
         return targets( Arrays.asList( relationships ) );
     }
 
-    public static Set<ProjectVersionRef> targets( final Collection<? extends ProjectRelationship<?>> relationships )
+    public static Set<ProjectVersionRef> targets( final Collection<? extends ProjectRelationship<?, ?>> relationships )
     {
         if ( relationships == null )
         {
@@ -245,7 +250,7 @@ public final class RelationshipUtils
         }
 
         final Set<ProjectVersionRef> results = new HashSet<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : relationships )
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             results.add( rel.getTarget() );
         }
@@ -253,15 +258,15 @@ public final class RelationshipUtils
         return results;
     }
 
-    public static Set<ProjectVersionRef> gavs( final ProjectRelationship<?>... relationships )
+    public static Set<ProjectVersionRef> gavs( final ProjectRelationship<?, ?>... relationships )
     {
         return gavs( Arrays.asList( relationships ) );
     }
 
-    public static Set<ProjectVersionRef> gavs( final Collection<? extends ProjectRelationship<?>> relationships )
+    public static Set<ProjectVersionRef> gavs( final Collection<? extends ProjectRelationship<?, ?>> relationships )
     {
         final Set<ProjectVersionRef> results = new HashSet<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : relationships )
+        for ( final ProjectRelationship<?, ?> rel : relationships )
         {
             results.add( rel.getDeclaring()
                             .asProjectVersionRef() );
@@ -279,7 +284,7 @@ public final class RelationshipUtils
                                                    final String version, final int index )
         throws InvalidVersionSpecificationException
     {
-        return new ExtensionRelationship( source, pomLocation, owner, projectVersion( groupId, artifactId, version ),
+        return new SimpleExtensionRelationship( source, pomLocation, owner, projectVersion( groupId, artifactId, version ),
                                           index );
     }
 
@@ -294,14 +299,14 @@ public final class RelationshipUtils
                                              final String artifactId, final String version, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginRelationship( source, pomLocation, owner, projectVersion( groupId, artifactId, version ), index, managed );
+        return new SimplePluginRelationship( source, pomLocation, owner, projectVersion( groupId, artifactId, version ), index, managed );
     }
 
     public static PluginRelationship plugin( final URI source, final URI pomLocation, final ProjectVersionRef owner, final ProjectVersionRef plugin,
                                              final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginRelationship( source, pomLocation, owner, plugin, index, managed );
+        return new SimplePluginRelationship( source, pomLocation, owner, plugin, index, managed );
     }
 
     public static PluginRelationship plugin( final URI source, final ProjectVersionRef owner, final String groupId, final String artifactId,
@@ -315,14 +320,14 @@ public final class RelationshipUtils
                                              final String version, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginRelationship( source, owner, projectVersion( groupId, artifactId, version ), index, managed );
+        return new SimplePluginRelationship( source, owner, projectVersion( groupId, artifactId, version ), index, managed );
     }
 
     public static PluginRelationship plugin( final URI source, final ProjectVersionRef owner, final ProjectVersionRef plugin, final int index,
                                              final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginRelationship( source, owner, plugin, index, managed );
+        return new SimplePluginRelationship( source, owner, plugin, index, managed );
     }
 
     public static PluginDependencyRelationship pluginDependency( final URI source, final ProjectVersionRef owner, final ProjectRef plugin,
@@ -345,7 +350,7 @@ public final class RelationshipUtils
                                                                  final String type, final String classifier, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginDependencyRelationship( source, owner, plugin, artifact( groupId, artifactId, version, type, classifier, false ), index,
+        return new SimplePluginDependencyRelationship( source, owner, plugin, artifact( groupId, artifactId, version, type, classifier, false ), index,
                                                  managed );
     }
 
@@ -354,7 +359,7 @@ public final class RelationshipUtils
                                                                  final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginDependencyRelationship( source, owner, plugin, artifact( dep, type, classifier, false ), index, managed );
+        return new SimplePluginDependencyRelationship( source, owner, plugin, artifact( dep, type, classifier, false ), index, managed );
     }
 
     public static PluginDependencyRelationship pluginDependency( final URI source, final URI pomLocation, final ProjectVersionRef owner,
@@ -379,7 +384,7 @@ public final class RelationshipUtils
                                                                  final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginDependencyRelationship( source, pomLocation, owner, plugin,
+        return new SimplePluginDependencyRelationship( source, pomLocation, owner, plugin,
                                                  artifact( groupId, artifactId, version, type, classifier, false ), index, managed );
     }
 
@@ -388,7 +393,7 @@ public final class RelationshipUtils
                                                                  final String classifier, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new PluginDependencyRelationship( source, pomLocation, owner, plugin, artifact( dep, type, classifier, false ), index, managed );
+        return new SimplePluginDependencyRelationship( source, pomLocation, owner, plugin, artifact( dep, type, classifier, false ), index, managed );
     }
 
     public static DependencyRelationship dependency( final URI source, final ProjectVersionRef owner, final String groupId, final String artifactId,
@@ -415,7 +420,7 @@ public final class RelationshipUtils
                                                      final DependencyScope scope, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, owner, artifact( dep, null, null, false ), scope, index, managed );
+        return new SimpleDependencyRelationship( source, owner, artifact( dep, null, null, false ), scope, index, managed );
     }
 
     public static DependencyRelationship dependency( final URI source, final ProjectVersionRef owner, final String groupId, final String artifactId,
@@ -423,7 +428,7 @@ public final class RelationshipUtils
                                                      final DependencyScope scope, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, owner, artifact( groupId, artifactId, version, type, classifier, optional ), null, index, false );
+        return new SimpleDependencyRelationship( source, owner, artifact( groupId, artifactId, version, type, classifier, optional ), null, index, false );
     }
 
     public static DependencyRelationship dependency( final URI source, final ProjectVersionRef owner, final ProjectVersionRef dep, final String type,
@@ -431,7 +436,7 @@ public final class RelationshipUtils
                                                      final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, owner, artifact( dep, type, classifier, optional ), null, index, false );
+        return new SimpleDependencyRelationship( source, owner, artifact( dep, type, classifier, optional ), null, index, false );
     }
 
     public static DependencyRelationship dependency( final URI source, final URI pomLocation, final ProjectVersionRef owner, final String groupId,
@@ -460,7 +465,7 @@ public final class RelationshipUtils
                                                      final ProjectVersionRef dep, final DependencyScope scope, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, pomLocation, owner, artifact( dep, null, null, false ), scope, index, managed );
+        return new SimpleDependencyRelationship( source, pomLocation, owner, artifact( dep, null, null, false ), scope, index, managed );
     }
 
     public static DependencyRelationship dependency( final URI source, final URI pomLocation, final ProjectVersionRef owner, final String groupId,
@@ -468,7 +473,7 @@ public final class RelationshipUtils
                                                      final boolean optional, final DependencyScope scope, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, pomLocation, owner, artifact( groupId, artifactId, version, type, classifier, optional ), null,
+        return new SimpleDependencyRelationship( source, pomLocation, owner, artifact( groupId, artifactId, version, type, classifier, optional ), null,
                                            index, false );
     }
 
@@ -477,7 +482,7 @@ public final class RelationshipUtils
                                                      final DependencyScope scope, final int index, final boolean managed )
         throws InvalidVersionSpecificationException
     {
-        return new DependencyRelationship( source, pomLocation, owner, artifact( dep, type, classifier, optional ), null, index, false );
+        return new SimpleDependencyRelationship( source, pomLocation, owner, artifact( dep, type, classifier, optional ), null, index, false );
     }
 
     public static Set<RelationshipType> getRelationshipTypes( final ProjectRelationshipFilter filter )

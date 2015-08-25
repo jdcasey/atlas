@@ -16,9 +16,7 @@
 package org.commonjava.maven.atlas.graph.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.jackson.ProjectVersionRefSerializerModule;
@@ -50,12 +48,12 @@ public class ProjectRelationshipSerializerModuleTest
     public void roundTrip_TerminalParentRelationship()
             throws Exception
     {
-        ParentRelationship rel = new ParentRelationship( new SimpleProjectVersionRef( "org.foo", "bar", "1" ) );
+        ParentRelationship rel = new SimpleParentRelationship( new SimpleProjectVersionRef( "org.foo", "bar", "1" ) );
 
         String json = mapper.writeValueAsString( rel );
         System.out.println( json );
 
-        ProjectRelationship<?> result = mapper.readValue( json, ProjectRelationship.class );
+        ProjectRelationship<?, ?> result = mapper.readValue( json, ProjectRelationship.class );
 
         assertThat( (ParentRelationship) result, equalTo( rel ) );
     }
@@ -64,14 +62,14 @@ public class ProjectRelationshipSerializerModuleTest
     public void roundTrip_ParentRelationship()
             throws Exception
     {
-        ParentRelationship rel = new ParentRelationship( URI.create( "some:test:location" ),
+        ParentRelationship rel = new SimpleParentRelationship( URI.create( "some:test:location" ),
                                                          new SimpleProjectVersionRef( "org.foo", "bar", "1" ),
                                                          new SimpleProjectVersionRef( "org.foo", "parent", "1001" ) );
 
         String json = mapper.writeValueAsString( rel );
         System.out.println( json );
 
-        ProjectRelationship<?> result = mapper.readValue( json, ProjectRelationship.class );
+        ProjectRelationship<?, ?> result = mapper.readValue( json, ProjectRelationship.class );
 
         assertThat( (ParentRelationship) result, equalTo( rel ) );
     }
@@ -81,7 +79,7 @@ public class ProjectRelationshipSerializerModuleTest
             throws Exception
     {
         DependencyRelationship rel =
-                new DependencyRelationship( URI.create( "some:test:location" ), RelationshipUtils.POM_ROOT_URI,
+                new SimpleDependencyRelationship( URI.create( "some:test:location" ), RelationshipUtils.POM_ROOT_URI,
                                             new SimpleProjectVersionRef( "org.foo", "bar", "1" ),
                                             new SimpleProjectVersionRef( "org.foo", "dep", "1.1" ).asJarArtifact(),
                                             DependencyScope.compile, 0, false );
@@ -89,7 +87,7 @@ public class ProjectRelationshipSerializerModuleTest
         String json = mapper.writeValueAsString( rel );
         System.out.println( json );
 
-        ProjectRelationship<?> result = mapper.readValue( json, ProjectRelationship.class );
+        ProjectRelationship<?, ?> result = mapper.readValue( json, ProjectRelationship.class );
 
         assertThat( (DependencyRelationship) result, equalTo( rel ) );
     }

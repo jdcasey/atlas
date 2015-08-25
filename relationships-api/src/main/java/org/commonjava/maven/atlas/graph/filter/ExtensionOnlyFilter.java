@@ -33,7 +33,7 @@ public class ExtensionOnlyFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         return NoneFilter.INSTANCE;
     }

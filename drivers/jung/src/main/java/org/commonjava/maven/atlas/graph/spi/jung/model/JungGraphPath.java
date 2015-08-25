@@ -29,45 +29,45 @@ import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 
 public class JungGraphPath
-    implements GraphPath<ProjectRelationship<?>>
+    implements GraphPath<ProjectRelationship<?, ?>>
 {
 
-    private final ProjectRelationship<?>[] rels;
+    private final ProjectRelationship<?, ?>[] rels;
 
     private final ProjectVersionRef root;
 
     public JungGraphPath( final ProjectVersionRef root )
     {
         this.root = root;
-        this.rels = new ProjectRelationship<?>[] {};
+        this.rels = new ProjectRelationship<?, ?>[] {};
     }
 
-    public JungGraphPath( final ProjectRelationship<?>... rels )
+    public JungGraphPath( final ProjectRelationship<?, ?>... rels )
     {
         this.root = null;
         this.rels = rels;
     }
 
-    public JungGraphPath( final JungGraphPath parent, final ProjectRelationship<?> child )
+    public JungGraphPath( final JungGraphPath parent, final ProjectRelationship<?, ?> child )
     {
         this.root = null;
         if ( parent == null )
         {
-            rels = new ProjectRelationship<?>[] { child };
+            rels = new ProjectRelationship<?, ?>[] { child };
         }
         else
         {
             final int parentLen = parent.rels.length;
-            this.rels = new ProjectRelationship<?>[parentLen + 1];
+            this.rels = new ProjectRelationship<?, ?>[parentLen + 1];
             System.arraycopy( parent.rels, 0, this.rels, 0, parentLen );
             this.rels[parentLen] = child;
         }
     }
 
-    public JungGraphPath( final List<ProjectRelationship<?>> path )
+    public JungGraphPath( final List<ProjectRelationship<?, ?>> path )
     {
         this.root = null;
-        this.rels = path.toArray( new ProjectRelationship<?>[path.size()] );
+        this.rels = path.toArray( new ProjectRelationship<?, ?>[path.size()] );
     }
 
     public ProjectVersionRef getTargetGAV()
@@ -114,9 +114,9 @@ public class JungGraphPath
     }
 
     @Override
-    public Iterator<ProjectRelationship<?>> iterator()
+    public Iterator<ProjectRelationship<?, ?>> iterator()
     {
-        return new Iterator<ProjectRelationship<?>>()
+        return new Iterator<ProjectRelationship<?, ?>>()
         {
             private int next = 0;
 
@@ -127,7 +127,7 @@ public class JungGraphPath
             }
 
             @Override
-            public ProjectRelationship<?> next()
+            public ProjectRelationship<?, ?> next()
             {
                 return rels[next++];
             }
@@ -140,9 +140,9 @@ public class JungGraphPath
         };
     }
 
-    public List<ProjectRelationship<?>> getPathElements()
+    public List<ProjectRelationship<?, ?>> getPathElements()
     {
-        return rels.length == 0 ? Collections.<ProjectRelationship<?>> emptyList() : Arrays.asList( rels );
+        return rels.length == 0 ? Collections.<ProjectRelationship<?, ?>> emptyList() : Arrays.asList( rels );
     }
 
     public boolean hasCycle()
@@ -153,7 +153,7 @@ public class JungGraphPath
         }
 
         final Set<ProjectVersionRef> declared = new HashSet<ProjectVersionRef>( rels.length );
-        for ( final ProjectRelationship<?> item : rels )
+        for ( final ProjectRelationship<?, ?> item : rels )
         {
             // NOTE: order is important here, in case it's a terminal parent relationship.
             if ( declared.contains( item.getTarget()

@@ -67,6 +67,16 @@
       </dependency>
       <dependency>
         <groupId>org.commonjava.maven.atlas</groupId>
+        <artifactId>atlas-driver-jung</artifactId>
+        <version>0.14.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.maven.atlas</groupId>
+        <artifactId>atlas-driver-neo4j-embedded</artifactId>
+        <version>0.14.3-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.commonjava.maven.atlas</groupId>
         <artifactId>atlas-drivers-tck</artifactId>
         <version>0.14.3-SNAPSHOT</version>
         <scope>test</scope>
@@ -141,5 +151,6 @@
     <module>bindings</module>
     <module>tck</module>
     <module>drivers</module>
+    <module>ftests</module>
   </modules>
 </project>

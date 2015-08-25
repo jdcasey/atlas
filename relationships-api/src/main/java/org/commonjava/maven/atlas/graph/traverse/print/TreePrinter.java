@@ -25,11 +25,10 @@ import java.util.Stack;
 
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.SimpleDependencyRelationship;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 
 public class TreePrinter
 {
@@ -63,14 +62,14 @@ public class TreePrinter
     //    }
 
     public void printStructure( final ProjectVersionRef from,
-                                  final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                                  final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
                                 final Map<String, Set<ProjectVersionRef>> labels, final PrintWriter writer )
     {
         printStructure( from, links, null, null, "  ", labels, writer );
     }
 
     public void printStructure( final ProjectVersionRef from,
-                                  final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                                  final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
  final String indent,
                                 final Map<String, Set<ProjectVersionRef>> labels, final PrintWriter writer )
     {
@@ -78,7 +77,7 @@ public class TreePrinter
     }
 
     public void printStructure( final ProjectVersionRef from,
-                                  final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                                  final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
                                   final String header, final String footer, final String indent,
                                 final Map<String, Set<ProjectVersionRef>> labels, final PrintWriter writer )
     {
@@ -101,17 +100,17 @@ public class TreePrinter
     }
 
     private void printLinks( final ProjectVersionRef from, final PrintWriter writer, final String indent,
-                             final int depth, final Map<ProjectVersionRef, List<ProjectRelationship<?>>> links,
+                             final int depth, final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> links,
                              final Map<String, Set<ProjectVersionRef>> labels, final Set<ProjectRef> excluded,
                              final Stack<ProjectVersionRef> inPath )
     {
         inPath.push( from );
         selected.put( from.asProjectRef(), from );
 
-        final List<ProjectRelationship<?>> outbound = links.get( from );
+        final List<ProjectRelationship<?, ?>> outbound = links.get( from );
         if ( outbound != null )
         {
-            for ( final ProjectRelationship<?> out : outbound )
+            for ( final ProjectRelationship<?, ?> out : outbound )
             {
                 final ProjectVersionRef outRef = out.getTarget()
                                               .asProjectVersionRef();
@@ -152,7 +151,7 @@ public class TreePrinter
                                         .asProjectVersionRef() ) )
                 {
                     Set<ProjectRef> newExcluded = null;
-                    if ( out instanceof DependencyRelationship )
+                    if ( out instanceof SimpleDependencyRelationship )
                     {
                         final Set<ProjectRef> excludes = ( (DependencyRelationship) out ).getExcludes();
                         if ( excludes != null && !excludes.isEmpty() )

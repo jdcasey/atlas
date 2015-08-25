@@ -19,9 +19,7 @@ import org.commonjava.maven.atlas.graph.filter.DependencyFilter;
 import org.commonjava.maven.atlas.graph.filter.OrFilter;
 import org.commonjava.maven.atlas.graph.filter.ParentFilter;
 import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
-import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleVersionlessArtifactRef;
@@ -62,8 +60,8 @@ public class TransitiveDependencyTraversal
     }
 
     @Override
-    public boolean shouldTraverseEdge( final ProjectRelationship<?> relationship,
-                                       final List<ProjectRelationship<?>> path )
+    public boolean shouldTraverseEdge( final ProjectRelationship<?, ?> relationship,
+                                       final List<ProjectRelationship<?, ?>> path )
     {
         boolean result = false;
         if ( relationship instanceof DependencyRelationship )
@@ -71,8 +69,8 @@ public class TransitiveDependencyTraversal
             final ArtifactRef target = (ArtifactRef) relationship.getTarget();
             final VersionlessArtifactRef versionlessTarget = new SimpleVersionlessArtifactRef( target );
 
-            logger.debug( "Checking for seen versionless GA[TC]: {}", versionlessTarget );
             final Integer distance = seenArtifacts.get( versionlessTarget );
+            logger.debug( "Checking for seen versionless GA[TC]: {}\nStored distance: {}\nPath distance: {}", versionlessTarget, distance, path.size() );
             if ( distance == null || distance > path.size() )
             {
                 logger.debug( "Adding: {} ({})", target, versionlessTarget );

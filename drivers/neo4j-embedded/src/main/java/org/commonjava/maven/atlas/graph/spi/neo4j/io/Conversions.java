@@ -26,34 +26,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.commonjava.maven.atlas.graph.ViewParams;
-import org.commonjava.maven.atlas.graph.rel.BomRelationship;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
 import org.commonjava.maven.atlas.graph.rel.PluginDependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.spi.neo4j.GraphAdmin;
 import org.commonjava.maven.atlas.graph.spi.neo4j.GraphRelType;
 import org.commonjava.maven.atlas.graph.spi.neo4j.NodeType;
-import org.commonjava.maven.atlas.graph.spi.neo4j.model.CyclePath;
+import org.commonjava.maven.atlas.graph.spi.neo4j.model.*;
 import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.*;
+import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Conversions
 {
@@ -193,13 +187,13 @@ public final class Conversions
         return refs;
     }
 
-    public static List<ProjectRelationship<?>> convertToRelationships( final Iterable<Relationship> relationships,
+    public static List<ProjectRelationship<?, ?>> convertToRelationships( final Iterable<Relationship> relationships,
                                                                        final ConversionCache cache )
     {
-        final List<ProjectRelationship<?>> rels = new ArrayList<ProjectRelationship<?>>();
+        final List<ProjectRelationship<?, ?>> rels = new ArrayList<ProjectRelationship<?, ?>>();
         for ( final Relationship relationship : relationships )
         {
-            final ProjectRelationship<?> rel = Conversions.toProjectRelationship( relationship, cache );
+            final ProjectRelationship<?, ?> rel = Conversions.toProjectRelationship( relationship, cache );
             if ( rel != null )
             {
                 rels.add( rel );
@@ -209,15 +203,15 @@ public final class Conversions
         return rels;
     }
 
-    public static List<ProjectRelationship<?>> convertToRelationships( final Iterable<Long> relationships,
+    public static List<ProjectRelationship<?, ?>> convertToRelationships( final Iterable<Long> relationships,
                                                                        final GraphAdmin admin,
                                                                        final ConversionCache cache )
     {
-        final List<ProjectRelationship<?>> rels = new ArrayList<ProjectRelationship<?>>();
+        final List<ProjectRelationship<?, ?>> rels = new ArrayList<ProjectRelationship<?, ?>>();
         for ( final Long rid : relationships )
         {
             final Relationship relationship = admin.getRelationship( rid );
-            final ProjectRelationship<?> rel = Conversions.toProjectRelationship( relationship, cache );
+            final ProjectRelationship<?, ?> rel = Conversions.toProjectRelationship( relationship, cache );
             if ( rel != null )
             {
                 rels.add( rel );
@@ -229,20 +223,30 @@ public final class Conversions
 
     public static void toNodeProperties( final ProjectVersionRef ref, final Node node, final boolean connected )
     {
-        final String g = ref.getGroupId();
-        final String a = ref.getArtifactId();
-        final String v = ref.getVersionString();
+        Logger logger = LoggerFactory.getLogger( Conversions.class );
 
-        if ( empty( g ) || empty( a ) || empty( v ) )
+        logger.debug( "Adding {} (type: {}) to node: {}", ref, ref.getClass().getSimpleName(), node );
+        if ( !( ref instanceof NeoProjectVersionRef ) || ((NeoProjectVersionRef)ref).isDirty() )
         {
-            throw new IllegalArgumentException( String.format( "GAV cannot contain nulls: %s:%s:%s", g, a, v ) );
+            final String g = ref.getGroupId();
+            final String a = ref.getArtifactId();
+            final String v = ref.getVersionString();
+
+            if ( empty( g ) || empty( a ) || empty( v ) )
+            {
+                throw new IllegalArgumentException( String.format( "GAV cannot contain nulls: %s:%s:%s", g, a, v ) );
+            }
+
+            node.setProperty( ARTIFACT_ID, a );
+            node.setProperty( GROUP_ID, g );
+
+            logger.debug( "Setting property: {} with value: {} for node: {}", VERSION, v, node.getId() );
+            node.setProperty( VERSION, v );
+
+            node.setProperty( GAV, ref.toString() );
         }
 
         node.setProperty( NODE_TYPE, NodeType.PROJECT.name() );
-        node.setProperty( ARTIFACT_ID, a );
-        node.setProperty( GROUP_ID, g );
-        node.setProperty( VERSION, v );
-        node.setProperty( GAV, ref.toString() );
 
         if ( ref.isVariableVersion() )
         {
@@ -250,6 +254,10 @@ public final class Conversions
         }
 
         markConnected( node, connected );
+//
+//        logger.debug( "groupId of {} is:\nNeoIdentityUtils: {}\nConversions: {}\nDirect access: {}", node,
+//                      NeoIdentityUtils.getStringProperty( node, GROUP_ID, null, null ),
+//                      getStringProperty( GROUP_ID, node ), node.hasProperty( GROUP_ID ) ? node.getProperty( GROUP_ID ) : null );
     }
 
     public static boolean isAtlasType( final Relationship rel )
@@ -291,16 +299,7 @@ public final class Conversions
             throw new IllegalArgumentException( "Node " + node.getId() + " is not a project reference." );
         }
 
-        final String g = getStringProperty( GROUP_ID, node );
-        final String a = getStringProperty( ARTIFACT_ID, node );
-        final String v = getStringProperty( VERSION, node );
-
-        if ( empty( g ) || empty( a ) || empty( v ) )
-        {
-            throw new IllegalArgumentException( String.format( "GAV cannot contain nulls: %s:%s:%s", g, a, v ) );
-        }
-
-        final ProjectVersionRef result = new SimpleProjectVersionRef( g, a, v );
+        final ProjectVersionRef result = new NeoProjectVersionRef( node );
         if ( cache != null )
         {
             cache.cache( node, result );
@@ -316,10 +315,13 @@ public final class Conversions
     }
 
     @SuppressWarnings( "incomplete-switch" )
-    public static void toRelationshipProperties( final ProjectRelationship<?> rel, final Relationship relationship )
+    public static void toRelationshipProperties( final ProjectRelationship<?, ?> rel, final Relationship relationship )
     {
         relationship.setProperty( INDEX, rel.getIndex() );
-        relationship.setProperty( SOURCE_URI, toStringArray( rel.getSources() ) );
+        String[] srcs = toStringArray( rel.getSources() );
+        Logger logger = LoggerFactory.getLogger( Conversions.class );
+        logger.debug( "Storing rel: {}\nwith sources: {}\n in property: {}\nRelationship: {}", rel, Arrays.toString(srcs), SOURCE_URI, relationship );
+        relationship.setProperty( SOURCE_URI, srcs );
         relationship.setProperty( POM_LOCATION_URI, rel.getPomLocation()
                                                        .toString() );
 
@@ -399,7 +401,7 @@ public final class Conversions
     //        return toProjectRelationship( rel, null );
     //    }
 
-    public static ProjectRelationship<?> toProjectRelationship( final Relationship rel, final ConversionCache cache )
+    public static ProjectRelationship<?, ?> toProjectRelationship( final Relationship rel, final ConversionCache cache )
     {
         if ( rel == null )
         {
@@ -408,7 +410,7 @@ public final class Conversions
 
         if ( cache != null )
         {
-            final ProjectRelationship<?> r = cache.getRelationship( rel );
+            final ProjectRelationship<?, ?> r = cache.getRelationship( rel );
             if ( r != null )
             {
                 return r;
@@ -432,79 +434,39 @@ public final class Conversions
             return null;
         }
 
-        final ProjectVersionRef from = toProjectVersionRef( rel.getStartNode(), cache );
-        final ProjectVersionRef to = toProjectVersionRef( rel.getEndNode(), cache );
-        final int index = getIntegerProperty( INDEX, rel );
-        final Set<URI> source = getURISetProperty( SOURCE_URI, rel, UNKNOWN_SOURCE_URI );
-        final URI pomLocation = getURIProperty( POM_LOCATION_URI, rel, POM_ROOT_URI );
-
-        ProjectRelationship<?> result = null;
+        ProjectRelationship<?, ?> result = null;
         switch ( mapper.atlasType() )
         {
             case DEPENDENCY:
             {
-                final ArtifactRef artifact = toArtifactRef( to, rel );
-                final boolean managed = getBooleanProperty( IS_MANAGED, rel );
-                final String scopeStr = getStringProperty( SCOPE, rel );
-                final DependencyScope scope = DependencyScope.getScope( scopeStr );
-
-                final String excludeStr = getStringProperty( EXCLUDES, rel );
-                final Set<ProjectRef> excludes = new HashSet<ProjectRef>();
-                if ( excludeStr != null )
-                {
-                    final String[] e = excludeStr.split( "\\s*,\\s*" );
-                    for ( final String ex : e )
-                    {
-                        final String[] parts = ex.split( ":" );
-                        if ( parts.length != 2 )
-                        {
-                            //                            LOGGER.error( "In: {} -> {} skipping invalid exclude specification: '{}'", from, artifact, ex );
-                        }
-                        else
-                        {
-                            excludes.add( new SimpleProjectRef( parts[0], parts[1] ) );
-                        }
-                    }
-                }
-
                 result =
-                    new DependencyRelationship( source, pomLocation, from, artifact, scope, index, managed,
-                                                excludes.toArray( new ProjectRef[excludes.size()] ) );
+                    new NeoDependencyRelationship( rel );
                 break;
             }
             case PLUGIN_DEP:
             {
-                final ArtifactRef artifact = toArtifactRef( to, rel );
-                final String pa = getStringProperty( PLUGIN_ARTIFACT_ID, rel );
-                final String pg = getStringProperty( PLUGIN_GROUP_ID, rel );
-                final boolean managed = getBooleanProperty( IS_MANAGED, rel );
-
                 result =
-                    new PluginDependencyRelationship( source, pomLocation, from, new SimpleProjectRef( pg, pa ), artifact,
-                                                      index, managed );
+                        new NeoPluginDependencyRelationship( rel );
                 break;
             }
             case PLUGIN:
             {
-                final boolean managed = getBooleanProperty( IS_MANAGED, rel );
-                final boolean reporting = getBooleanProperty( IS_REPORTING_PLUGIN, rel );
-
-                result = new PluginRelationship( source, pomLocation, from, to, index, managed, reporting );
+                result = new NeoPluginRelationship( rel );
                 break;
             }
             case EXTENSION:
             {
-                result = new ExtensionRelationship( source, from, to, index );
+                result = new NeoExtensionRelationship( rel );
                 break;
             }
             case BOM:
             {
-                result = new BomRelationship( source, from, to, index );
+                result = new NeoBomRelationship( rel );
                 break;
             }
             case PARENT:
             {
-                result = new ParentRelationship( source, from, to );
+                result = new NeoParentRelationship( rel );
                 break;
             }
             default:
@@ -523,7 +485,7 @@ public final class Conversions
         return result;
     }
 
-    public static String id( final ProjectRelationship<?> rel )
+    public static String id( final ProjectRelationship<?, ?> rel )
     {
         return DigestUtils.shaHex( rel.toString() );
     }
@@ -539,13 +501,18 @@ public final class Conversions
         final String classifier = getStringProperty( CLASSIFIER, rel );
         final boolean optional = getBooleanProperty( OPTIONAL, rel );
 
-        return new SimpleArtifactRef( ref, type, classifier, optional );
+        return new NeoArtifactRef( ref, new NeoTypeAndClassifier( rel ), optional );
     }
 
     private static void toRelationshipProperties( final ArtifactRef target, final Relationship relationship )
     {
         relationship.setProperty( OPTIONAL, target.isOptional() );
+
+        Logger logger = LoggerFactory.getLogger( Conversions.class );
+        logger.debug( "Type of artifact: {} (type: {}) is: {}", target, target.getClass().getSimpleName(),
+                      target.getType() );
         relationship.setProperty( TYPE, target.getType() );
+
         if ( target.getClassifier() != null )
         {
             relationship.setProperty( CLASSIFIER, target.getClassifier() );

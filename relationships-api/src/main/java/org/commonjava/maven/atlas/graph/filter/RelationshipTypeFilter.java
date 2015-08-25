@@ -59,7 +59,7 @@ public class RelationshipTypeFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         final Set<RelationshipType> descendantTypes = getDescendantRelationshipTypes();
         final Set<RelationshipType> allowedTypes = getAllowedTypes();

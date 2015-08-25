@@ -21,6 +21,8 @@ import org.commonjava.maven.atlas.graph.filter.AnyFilter;
 import org.commonjava.maven.atlas.graph.filter.NoneFilter;
 import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractFilteringTraversal
     extends AbstractTraversal
@@ -38,11 +40,11 @@ public abstract class AbstractFilteringTraversal
         rootFilter = filter;
     }
 
-    protected abstract boolean shouldTraverseEdge( ProjectRelationship<?> relationship,
-                                                   List<ProjectRelationship<?>> path );
+    protected abstract boolean shouldTraverseEdge( ProjectRelationship<?, ?> relationship,
+                                                   List<ProjectRelationship<?, ?>> path );
 
-    protected void edgeTraversalFinished( final ProjectRelationship<?> relationship,
-                                          final List<ProjectRelationship<?>> path )
+    protected void edgeTraversalFinished( final ProjectRelationship<?, ?> relationship,
+                                          final List<ProjectRelationship<?, ?>> path )
     {
     }
 
@@ -52,29 +54,32 @@ public abstract class AbstractFilteringTraversal
     }
 
     @Override
-    public final void edgeTraversed( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public final void edgeTraversed( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         edgeTraversalFinished( relationship, path );
     }
 
     @Override
-    public final boolean traverseEdge( final ProjectRelationship<?> relationship,
-                                       final List<ProjectRelationship<?>> path )
+    public final boolean traverseEdge( final ProjectRelationship<?, ?> relationship,
+                                       final List<ProjectRelationship<?, ?>> path )
     {
+        Logger logger = LoggerFactory.getLogger( getClass() );
         if ( !preCheck( relationship, path ) )
         {
+            logger.debug("DON'T traverse: {}", relationship );
             return false;
         }
 
         //        seen.add( relationship );
 
         final boolean ok = shouldTraverseEdge( relationship, path );
+        logger.debug( "Traverse: {}?\n{}", relationship, ok );
 
         return ok;
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         boolean result = true;
 
@@ -87,7 +92,7 @@ public abstract class AbstractFilteringTraversal
         return result;
     }
 
-    private ProjectRelationshipFilter constructFilter( final List<ProjectRelationship<?>> path )
+    private ProjectRelationshipFilter constructFilter( final List<ProjectRelationship<?, ?>> path )
     {
         if ( rootFilter == null )
         {
@@ -95,7 +100,7 @@ public abstract class AbstractFilteringTraversal
         }
 
         ProjectRelationshipFilter filter = rootFilter;
-        for ( final ProjectRelationship<?> rel : path )
+        for ( final ProjectRelationship<?, ?> rel : path )
         {
             if ( !filter.accept( rel ) )
             {

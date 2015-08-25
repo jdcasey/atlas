@@ -58,7 +58,7 @@ public class DependencyOnlyFilter
     }
 
     @Override
-    public boolean doAccept( final ProjectRelationship<?> rel )
+    public boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
         if ( this.scopes == null || this.scopes.length < 1 )
         {
@@ -83,7 +83,7 @@ public class DependencyOnlyFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         return NoneFilter.INSTANCE;
     }

@@ -35,14 +35,10 @@
       <groupId>org.commonjava.maven.atlas</groupId>
       <artifactId>atlas-relationships-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.commonjava.maven.atlas</groupId>
-      <artifactId>atlas-drivers-tck</artifactId>
-    </dependency>
   </dependencies>
   
   <modules>
-    <module>jung</module>
     <module>neo4j-embedded</module>
+    <module>jung</module>
   </modules>
 </project>

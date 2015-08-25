@@ -27,6 +27,7 @@ import java.util.Stack;
 import org.commonjava.maven.atlas.graph.RelationshipGraph;
 import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.SimpleDependencyRelationship;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionException;
 import org.commonjava.maven.atlas.graph.traverse.RelationshipGraphTraversal;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
@@ -45,7 +46,7 @@ public class StructurePrintingTraversal
 
     private final StructureRelationshipPrinter relationshipPrinter;
 
-    private final Map<ProjectVersionRef, List<ProjectRelationship<?>>> outboundLinks = new HashMap<ProjectVersionRef, List<ProjectRelationship<?>>>();
+    private final Map<ProjectVersionRef, List<ProjectRelationship<?, ?>>> outboundLinks = new HashMap<ProjectVersionRef, List<ProjectRelationship<?, ?>>>();
 
     public StructurePrintingTraversal()
     {
@@ -72,14 +73,14 @@ public class StructurePrintingTraversal
     }
 
     @Override
-    public boolean traverseEdge( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean traverseEdge( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         if ( traversal == null || traversal.traverseEdge( relationship, path ) )
         {
-            List<ProjectRelationship<?>> outbound = outboundLinks.get( relationship.getDeclaring() );
+            List<ProjectRelationship<?, ?>> outbound = outboundLinks.get( relationship.getDeclaring() );
             if ( outbound == null )
             {
-                outbound = new ArrayList<ProjectRelationship<?>>();
+                outbound = new ArrayList<ProjectRelationship<?, ?>>();
                 outboundLinks.put( relationship.getDeclaring(), outbound );
             }
 
@@ -132,10 +133,10 @@ public class StructurePrintingTraversal
                              final Set<ProjectRef> excluded, final Stack<ProjectVersionRef> inPath )
     {
         inPath.push( from );
-        final List<ProjectRelationship<?>> outbound = outboundLinks.get( from );
+        final List<ProjectRelationship<?, ?>> outbound = outboundLinks.get( from );
         if ( outbound != null )
         {
-            for ( final ProjectRelationship<?> out : outbound )
+            for ( final ProjectRelationship<?, ?> out : outbound )
             {
                 final ProjectVersionRef outRef = out.getTarget()
                                               .asProjectVersionRef();
@@ -157,7 +158,7 @@ public class StructurePrintingTraversal
                                       .asProjectVersionRef() ) )
                 {
                     Set<ProjectRef> newExcluded = null;
-                    if ( out instanceof DependencyRelationship )
+                    if ( out instanceof SimpleDependencyRelationship )
                     {
                         final Set<ProjectRef> excludes = ( (DependencyRelationship) out ).getExcludes();
                         if ( excludes != null && !excludes.isEmpty() )
@@ -188,7 +189,7 @@ public class StructurePrintingTraversal
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         return traversal == null || traversal.preCheck( relationship, path );
     }
@@ -214,7 +215,7 @@ public class StructurePrintingTraversal
     }
 
     @Override
-    public void edgeTraversed( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public void edgeTraversed( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         if ( traversal != null )
         {

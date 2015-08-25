@@ -73,7 +73,7 @@ final class PathDetectionTraversal
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         JungGraphPath jpath;
         GraphPathInfo pathInfo;
@@ -93,7 +93,7 @@ final class PathDetectionTraversal
             return false;
         }
 
-        final ProjectRelationship<?> selected = pathInfo.selectRelationship( relationship, jpath );
+        final ProjectRelationship<?, ?> selected = pathInfo.selectRelationship( relationship, jpath );
         if ( selected == null )
         {
             return false;

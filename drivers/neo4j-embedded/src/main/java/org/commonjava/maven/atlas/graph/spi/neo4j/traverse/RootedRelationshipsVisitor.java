@@ -31,20 +31,20 @@ import org.slf4j.LoggerFactory;
 
 public class RootedRelationshipsVisitor
     extends AbstractTraverseVisitor
-    implements Iterable<ProjectRelationship<?>>
+    implements Iterable<ProjectRelationship<?, ?>>
 {
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private final Set<ProjectRelationship<?>> found = new HashSet<ProjectRelationship<?>>();
+    private final Set<ProjectRelationship<?, ?>> found = new HashSet<ProjectRelationship<?, ?>>();
 
-    public Set<ProjectRelationship<?>> getRelationships()
+    public Set<ProjectRelationship<?, ?>> getRelationships()
     {
         return found;
     }
 
     @Override
-    public Iterator<ProjectRelationship<?>> iterator()
+    public Iterator<ProjectRelationship<?, ?>> iterator()
     {
         return found.iterator();
     }

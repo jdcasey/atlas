@@ -96,7 +96,7 @@ public class CycleCacheUpdater
             logger.debug( "Adding cycle: {} (via: {})", cyclicPath, injector );
             Conversions.storeCachedCyclePath( cyclicPath, viewNode );
 
-            final List<ProjectRelationship<?>> cycle = Conversions.convertToRelationships( cyclicPath, admin, cache );
+            final List<ProjectRelationship<?, ?>> cycle = Conversions.convertToRelationships( cyclicPath, admin, cache );
             logger.info( "CYCLES += {\n  {}\n}", new JoinString( "\n  ", cycle ) );
             cycles.add( new EProjectCycle( cycle ) );
 

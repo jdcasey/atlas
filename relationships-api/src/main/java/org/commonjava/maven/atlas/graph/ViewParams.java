@@ -369,6 +369,11 @@ public class ViewParams
         return activeSources;
     }
 
+    public final Map<ProjectRef, ProjectVersionRef> getSelections()
+    {
+        return selections == null ? Collections.<ProjectRef, ProjectVersionRef> emptyMap() : selections;
+    }
+
     public final ProjectVersionRef getSelection( final ProjectRef ref )
     {
         if ( selections == null )

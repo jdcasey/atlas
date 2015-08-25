@@ -265,7 +265,7 @@ public class ProjectRelationshipSerializerModule
             // handle null implicitly by comparing to true.
             boolean managed = Boolean.TRUE.equals( ast.get( MANAGED ) );
 
-            ProjectRelationship<?> rel = null;
+            ProjectRelationship<?, ?> rel = null;
             switch ( type )
             {
                 case DEPENDENCY:
@@ -283,7 +283,7 @@ public class ProjectRelationshipSerializerModule
                         scope = DependencyScope.getScope( scp );
                     }
 
-                    rel = new DependencyRelationship( sources, pomLocation, declaring, target, scope, index,
+                    rel = new SimpleDependencyRelationship( sources, pomLocation, declaring, target, scope, index,
                                                       managed );
                     break;
                 }
@@ -291,14 +291,14 @@ public class ProjectRelationshipSerializerModule
                 {
                     final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
-                    rel = new ExtensionRelationship( sources, pomLocation, declaring, target, index );
+                    rel = new SimpleExtensionRelationship( sources, pomLocation, declaring, target, index );
                     break;
                 }
                 case PARENT:
                 {
                     final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
-                    rel = new ParentRelationship( sources, declaring, target );
+                    rel = new SimpleParentRelationship( sources, declaring, target );
                     break;
                 }
                 case PLUGIN:
@@ -306,7 +306,7 @@ public class ProjectRelationshipSerializerModule
                     final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
                     Boolean report = (Boolean) ast.get( REPORTING );
-                    rel = new PluginRelationship( sources, pomLocation, declaring, target, index,
+                    rel = new SimplePluginRelationship( sources, pomLocation, declaring, target, index,
                                                   managed, Boolean.TRUE.equals(report) );
                     break;
                 }
@@ -323,7 +323,7 @@ public class ProjectRelationshipSerializerModule
                     final ProjectRef plugin = SimpleProjectRef.parse( plug );
                     final ArtifactRef target = SimpleArtifactRef.parse( tgt );
 
-                    rel = new PluginDependencyRelationship( sources, pomLocation, declaring, plugin, target, index,
+                    rel = new SimplePluginDependencyRelationship( sources, pomLocation, declaring, plugin, target, index,
                                                             managed );
                     break;
                 }
@@ -331,7 +331,7 @@ public class ProjectRelationshipSerializerModule
                 {
                     final ProjectVersionRef target = SimpleProjectVersionRef.parse( tgt );
 
-                    rel = new BomRelationship( sources, pomLocation, declaring, target, index );
+                    rel = new SimpleBomRelationship( sources, pomLocation, declaring, target, index );
                     break;
                 }
             }

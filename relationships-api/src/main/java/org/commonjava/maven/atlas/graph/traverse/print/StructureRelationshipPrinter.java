@@ -24,7 +24,7 @@ import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 
 public interface StructureRelationshipPrinter
 {
-    void print( ProjectRelationship<?> relationship, ProjectVersionRef targetOverride, PrintWriter writer,
+    void print( ProjectRelationship<?, ?> relationship, ProjectVersionRef targetOverride, PrintWriter writer,
                 Map<String, Set<ProjectVersionRef>> labels, int depth, String indent );
 
     void printProjectVersionRef( ProjectVersionRef targetArtifact, PrintWriter writer, String targetSuffix,

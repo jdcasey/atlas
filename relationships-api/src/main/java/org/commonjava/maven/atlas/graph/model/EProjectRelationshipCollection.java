@@ -24,8 +24,8 @@ public interface EProjectRelationshipCollection
     extends Serializable
 {
 
-    Collection<ProjectRelationship<?>> getAllRelationships();
+    Collection<ProjectRelationship<?, ?>> getAllRelationships();
 
-    Collection<ProjectRelationship<?>> getExactAllRelationships();
+    Collection<ProjectRelationship<?, ?>> getExactAllRelationships();
 
 }

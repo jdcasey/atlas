@@ -21,6 +21,7 @@ import java.util.Set;
 import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
 import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
 import org.commonjava.maven.atlas.graph.rel.RelationshipType;
+import org.commonjava.maven.atlas.graph.rel.SimplePluginRelationship;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 
 public class PluginRuntimeFilter
@@ -37,17 +38,17 @@ public class PluginRuntimeFilter
     }
 
     @Override
-    public boolean accept( final ProjectRelationship<?> rel )
+    public boolean accept( final ProjectRelationship<?, ?> rel )
     {
-        return ( rel instanceof PluginRelationship ) && !( (PluginRelationship) rel ).isManaged();
+        return ( rel instanceof SimplePluginRelationship ) && !( (PluginRelationship) rel ).isManaged();
     }
 
     // TODO: Optimize to minimize new instance creation...
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         ProjectRelationshipFilter child;
-        if ( parent instanceof PluginRelationship )
+        if ( parent instanceof SimplePluginRelationship )
         {
             final PluginRelationship plugin = (PluginRelationship) parent;
 

@@ -26,7 +26,7 @@ public class FilteringTraversal
     extends AbstractFilteringTraversal
 {
 
-    private final List<ProjectRelationship<?>> captured = new ArrayList<ProjectRelationship<?>>();
+    private final List<ProjectRelationship<?, ?>> captured = new ArrayList<ProjectRelationship<?, ?>>();
 
     private final boolean doCapture;
 
@@ -41,7 +41,7 @@ public class FilteringTraversal
         this.doCapture = doCapture;
     }
 
-    public List<ProjectRelationship<?>> getCapturedRelationships()
+    public List<ProjectRelationship<?, ?>> getCapturedRelationships()
     {
         return captured;
     }
@@ -49,7 +49,7 @@ public class FilteringTraversal
     public List<ProjectVersionRef> getCapturedProjects( final boolean unique )
     {
         final List<ProjectVersionRef> refs = new ArrayList<ProjectVersionRef>();
-        for ( final ProjectRelationship<?> rel : captured )
+        for ( final ProjectRelationship<?, ?> rel : captured )
         {
             final ProjectVersionRef d = rel.getDeclaring();
             final ProjectVersionRef t = rel.getTarget()
@@ -70,8 +70,8 @@ public class FilteringTraversal
     }
 
     @Override
-    protected boolean shouldTraverseEdge( final ProjectRelationship<?> relationship,
-                                          final List<ProjectRelationship<?>> path )
+    protected boolean shouldTraverseEdge( final ProjectRelationship<?, ?> relationship,
+                                          final List<ProjectRelationship<?, ?>> path )
     {
         if ( doCapture )
         {

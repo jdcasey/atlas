@@ -30,7 +30,7 @@ public class ManagedDependencyMutator
     private static final long serialVersionUID = 1L;
 
     @Override
-    public ProjectRelationship<?> selectFor( final ProjectRelationship<?> rel, final GraphPath<?> path,
+    public ProjectRelationship<?, ?> selectFor( final ProjectRelationship<?, ?> rel, final GraphPath<?> path,
                                              final RelationshipGraphConnection connection, final ViewParams params )
     {
         if ( rel.getType() != RelationshipType.DEPENDENCY ) // TODO: BOM types??
@@ -39,7 +39,7 @@ public class ManagedDependencyMutator
             return rel;
         }
 
-        ProjectRelationship<?> mutated = super.selectFor( rel, path, connection, params );
+        ProjectRelationship<?, ?> mutated = super.selectFor( rel, path, connection, params );
         if ( mutated == null || mutated == rel )
         {
             final ProjectVersionRef managed =

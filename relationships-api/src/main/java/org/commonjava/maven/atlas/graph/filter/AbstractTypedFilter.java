@@ -141,7 +141,7 @@ public abstract class AbstractTypedFilter
     }
 
     @Override
-    public final boolean accept( final ProjectRelationship<?> rel )
+    public final boolean accept( final ProjectRelationship<?, ?> rel )
     {
         if ( types.contains( rel.getType() ) )
         {
@@ -177,7 +177,7 @@ public abstract class AbstractTypedFilter
         return descendantTypes;
     }
 
-    protected boolean doAccept( final ProjectRelationship<?> rel )
+    protected boolean doAccept( final ProjectRelationship<?, ?> rel )
     {
         // base functionality is only to check that the type is appropriate.
         return true;

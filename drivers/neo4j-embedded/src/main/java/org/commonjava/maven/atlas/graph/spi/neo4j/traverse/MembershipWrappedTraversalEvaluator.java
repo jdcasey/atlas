@@ -113,9 +113,9 @@ public class MembershipWrappedTraversalEvaluator<STATE>
         if ( roots == null || roots.isEmpty() || roots.contains( path.startNode()
                                                                      .getId() ) )
         {
-            final ProjectRelationship<?> lastRel = Conversions.toProjectRelationship( rel, cache );
+            final ProjectRelationship<?, ?> lastRel = Conversions.toProjectRelationship( rel, cache );
 
-            final List<ProjectRelationship<?>> relPath = Conversions.convertToRelationships( path.relationships(), cache );
+            final List<ProjectRelationship<?, ?>> relPath = Conversions.convertToRelationships( path.relationships(), cache );
             if ( relPath.indexOf( lastRel ) == relPath.size() - 1 )
             {
                 //                logger.warn( "\n\n\n\n\nREMOVING last-relationship: {} from path!\n\n\n\n\n" );
@@ -179,7 +179,7 @@ public class MembershipWrappedTraversalEvaluator<STATE>
         // sort the child relationships to make the traversal deterministic
         final Set<Relationship> result = new TreeSet<Relationship>( new AtlasRelIndexComparator() );
 
-        final List<ProjectRelationship<?>> rels = getPathRelationships( path );
+        final List<ProjectRelationship<?, ?>> rels = getPathRelationships( path );
 
         //        logger.info( "For: {} Determining which of {} child relationships to expand traversal into for: {}\n{}", traversal.getClass()
         //                                                                                                                          .getName(), path.length(),
@@ -209,7 +209,7 @@ public class MembershipWrappedTraversalEvaluator<STATE>
             }
             //            logger.info( "Attempting to expand: {}", r );
 
-            final ProjectRelationship<?> projectRel = Conversions.toProjectRelationship( r, cache );
+            final ProjectRelationship<?, ?> projectRel = Conversions.toProjectRelationship( r, cache );
 
             logger.debug( "Pre-checking relationship {} for expansion using filter: {}", projectRel, traversal );
             if ( traversal.preCheck( projectRel, rels ) )
@@ -227,9 +227,9 @@ public class MembershipWrappedTraversalEvaluator<STATE>
         return result;
     }
 
-    private List<ProjectRelationship<?>> getPathRelationships( final Path path )
+    private List<ProjectRelationship<?, ?>> getPathRelationships( final Path path )
     {
-        List<ProjectRelationship<?>> rels;
+        List<ProjectRelationship<?, ?>> rels;
         final Iterable<Relationship> rs = path.relationships();
         if ( rs == null )
         {

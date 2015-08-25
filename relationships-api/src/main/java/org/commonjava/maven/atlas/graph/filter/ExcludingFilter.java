@@ -46,7 +46,7 @@ public class ExcludingFilter
     }
 
     @Override
-    public boolean accept( final ProjectRelationship<?> rel )
+    public boolean accept( final ProjectRelationship<?, ?> rel )
     {
         final ProjectVersionRef target = rel.getTarget()
                                             .asProjectVersionRef();
@@ -54,7 +54,7 @@ public class ExcludingFilter
     }
 
     @Override
-    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?> parent )
+    public ProjectRelationshipFilter getChildFilter( final ProjectRelationship<?, ?> parent )
     {
         ProjectRelationshipFilter childfilter = filter.getChildFilter( parent );
         if ( childfilter == filter )

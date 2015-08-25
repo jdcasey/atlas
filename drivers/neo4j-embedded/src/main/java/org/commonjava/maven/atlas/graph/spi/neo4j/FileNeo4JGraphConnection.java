@@ -20,13 +20,12 @@ import org.commonjava.maven.atlas.graph.ViewParams;
 import org.commonjava.maven.atlas.graph.model.EProjectCycle;
 import org.commonjava.maven.atlas.graph.model.GraphPath;
 import org.commonjava.maven.atlas.graph.model.GraphPathInfo;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
-import org.commonjava.maven.atlas.graph.rel.RelationshipComparator;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.graph.rel.RelationshipType;
 import org.commonjava.maven.atlas.graph.spi.RelationshipGraphConnectionException;
 import org.commonjava.maven.atlas.graph.spi.neo4j.io.ConversionCache;
 import org.commonjava.maven.atlas.graph.spi.neo4j.io.Conversions;
+import org.commonjava.maven.atlas.graph.spi.neo4j.model.AbstractNeoProjectRelationship;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.CyclePath;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.Neo4jGraphPath;
 import org.commonjava.maven.atlas.graph.spi.neo4j.traverse.*;
@@ -219,7 +218,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Collection<? extends ProjectRelationship<?>> getRelationshipsDeclaredBy( final ViewParams params,
+    public Collection<? extends ProjectRelationship<?, ?>> getRelationshipsDeclaredBy( final ViewParams params,
                                                                                     final ProjectVersionRef ref )
     {
         checkClosed();
@@ -253,7 +252,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Collection<? extends ProjectRelationship<?>> getRelationshipsTargeting( final ViewParams params,
+    public Collection<? extends ProjectRelationship<?, ?>> getRelationshipsTargeting( final ViewParams params,
                                                                                    final ProjectVersionRef ref )
     {
         checkClosed();
@@ -278,12 +277,12 @@ public class FileNeo4JGraphConnection
             final RelationshipIndex cachedRels = new ViewIndexes( graph.index(), params ).getCachedRelationships();
             final IndexHits<Relationship> hits = cachedRels.query( RID, sb.toString() );
 
-            final Set<ProjectRelationship<?>> result = new HashSet<ProjectRelationship<?>>();
+            final Set<ProjectRelationship<?, ?>> result = new HashSet<ProjectRelationship<?, ?>>();
 
             while ( hits.hasNext() )
             {
                 final Relationship r = hits.next();
-                final ProjectRelationship<?> rel = toProjectRelationship( r, cache );
+                final ProjectRelationship<?, ?> rel = toProjectRelationship( r, cache );
                 result.add( rel );
             }
 
@@ -369,7 +368,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Collection<ProjectRelationship<?>> getAllRelationships( final ViewParams params )
+    public Collection<ProjectRelationship<?, ?>> getAllRelationships( final ViewParams params )
     {
         checkClosed();
 
@@ -379,7 +378,7 @@ public class FileNeo4JGraphConnection
             final RelationshipIndex cachedRels = new ViewIndexes( graph.index(), params ).getCachedRelationships();
 
             final IndexHits<Relationship> relHits = cachedRels.query( RID, "*" );
-            final Set<ProjectRelationship<?>> rels = new HashSet<ProjectRelationship<?>>();
+            final Set<ProjectRelationship<?, ?>> rels = new HashSet<ProjectRelationship<?, ?>>();
             while ( relHits.hasNext() )
             {
                 rels.add( toProjectRelationship( relHits.next(), cache ) );
@@ -458,7 +457,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Set<List<ProjectRelationship<?>>> getAllPathsTo( final ViewParams params, final ProjectVersionRef... refs )
+    public Set<List<ProjectRelationship<?, ?>>> getAllPathsTo( final ViewParams params, final ProjectVersionRef... refs )
     {
         checkClosed();
         if ( !registerView( params ) )
@@ -473,7 +472,7 @@ public class FileNeo4JGraphConnection
         final PathCollectingVisitor visitor = new PathCollectingVisitor( endNodes, cache );
         collectAtlasRelationships( params, visitor, getRoots( params ), false, Uniqueness.RELATIONSHIP_GLOBAL );
 
-        final Set<List<ProjectRelationship<?>>> result = new HashSet<List<ProjectRelationship<?>>>();
+        final Set<List<ProjectRelationship<?, ?>>> result = new HashSet<List<ProjectRelationship<?, ?>>>();
         for ( final Neo4jGraphPath path : visitor )
         {
             result.add( convertToRelationships( path, adminAccess, cache ) );
@@ -483,15 +482,15 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public synchronized Set<ProjectRelationship<?>> addRelationships( final ProjectRelationship<?>... rels )
+    public synchronized Set<ProjectRelationship<?, ?>> addRelationships( final ProjectRelationship<?, ?>... rels )
     {
-        final Map<Long, ProjectRelationship<?>> createdRelationshipsMap = addRelationshipsInternal( rels );
+        final Map<Long, ProjectRelationship<?, ?>> createdRelationshipsMap = addRelationshipsInternal( rels );
 
         logger.info( "Updating all-projects caches with {} new entries", createdRelationshipsMap.size() );
         updateCaches( createdRelationshipsMap );
 
         // FIXME: We're delaying cycle detection, so there will NEVER be rejected relationships...
-        final Set<ProjectRelationship<?>> skipped = Collections.emptySet();
+        final Set<ProjectRelationship<?, ?>> skipped = Collections.emptySet();
         logger.debug( "Cycle injection detected for: {}", skipped );
         logger.info( "Returning {} rejected relationships.", skipped.size() );
 
@@ -500,22 +499,28 @@ public class FileNeo4JGraphConnection
         return skipped;
     }
 
-    private Map<Long, ProjectRelationship<?>> addRelationshipsInternal( final ProjectRelationship<?>... rels )
+    private Map<Long, ProjectRelationship<?, ?>> addRelationshipsInternal( final ProjectRelationship<?, ?>... rels )
     {
         checkClosed();
 
         final ConversionCache cache = new ConversionCache();
-        final Map<Long, ProjectRelationship<?>> createdRelationshipsMap = new HashMap<Long, ProjectRelationship<?>>();
+        final Map<Long, ProjectRelationship<?, ?>> createdRelationshipsMap = new HashMap<Long, ProjectRelationship<?, ?>>();
 
-        final List<ProjectRelationship<?>> sorted = new ArrayList<ProjectRelationship<?>>( Arrays.asList( rels ) );
+        final List<ProjectRelationship<?, ?>> sorted = new ArrayList<ProjectRelationship<?, ?>>( Arrays.asList( rels ) );
         Collections.sort( sorted, RelationshipComparator.INSTANCE );
 
         final Transaction tx = graph.beginTx();
         try
         {
             //            int txBatchCount = 0;
-            nextRel: for ( final ProjectRelationship<?> rel : sorted )
+            nextRel: for ( final ProjectRelationship<?, ?> rel : sorted )
             {
+                if ( (rel instanceof AbstractNeoProjectRelationship ) && !( (AbstractNeoProjectRelationship) rel ).isDirty())
+                {
+                    logger.debug("Clean Neo4j-backed relationship: {} NOT being added.", rel );
+                    continue;
+                }
+
                 logger.debug( "Checking relationship: {}", rel );
 
                 final Index<Node> index = graph.index()
@@ -621,7 +626,7 @@ public class FileNeo4JGraphConnection
                         continue;
                     }
 
-                    if ( !( rel instanceof ParentRelationship ) || !( (ParentRelationship) rel ).isTerminus() )
+                    if ( !( rel instanceof SimpleParentRelationship ) || !( (ParentRelationship) rel ).isTerminus() )
                     {
                         createdRelationshipsMap.put( relationship.getId(), rel );
                     }
@@ -659,7 +664,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public boolean introducesCycle( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean introducesCycle( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         checkClosed();
 
@@ -728,14 +733,14 @@ public class FileNeo4JGraphConnection
             return graph.getRelationshipById( targetRid );
         }
 
-        final ProjectRelationship<?> oldRel = toProjectRelationship( old, null );
+        final ProjectRelationship<?, ?> oldRel = toProjectRelationship( old, null );
         if ( oldRel == null )
         {
             return null;
         }
 
         logger.debug( "Selecting mutated relationship for: {} with pathInfo: {}", oldRel, pathInfo );
-        final ProjectRelationship<?> selected = pathInfo == null ? oldRel : pathInfo.selectRelationship( oldRel, path );
+        final ProjectRelationship<?, ?> selected = pathInfo == null ? oldRel : pathInfo.selectRelationship( oldRel, path );
 
         if ( selected == null )
         {
@@ -752,12 +757,12 @@ public class FileNeo4JGraphConnection
                 return result;
             }
 
-            logger.info( "Creating ad-hoc db relationship for selection: {} (replacing: {})", selected, oldRel );
+            logger.debug( "Creating ad-hoc db relationship for selection: {} (replacing: {})", selected, oldRel );
 
             @SuppressWarnings( "unused" )
-            final Map<Long, ProjectRelationship<?>> added = addRelationshipsInternal( selected );
+            final Map<Long, ProjectRelationship<?, ?>> added = addRelationshipsInternal( selected );
 
-            final Transaction tx = graph.beginTx();
+//            final Transaction tx = graph.beginTx();
             try
             {
                 result = getRelationship( selId );
@@ -775,13 +780,13 @@ public class FileNeo4JGraphConnection
                                                                  .getId() );
                 }
 
-                tx.success();
+//                tx.success();
 
                 return result;
             }
             finally
             {
-                tx.finish();
+//                tx.finish();
             }
         }
 
@@ -860,25 +865,35 @@ public class FileNeo4JGraphConnection
         description = description.expand( checker )
                                  .evaluator( checker );
 
-        final Traverser traverser = description.traverse( rootNode );
-        for ( final Path path : traverser )
+        Transaction tx = this.graph.beginTx();
+        try
         {
-            if ( path.lastRelationship() == null )
+            final Traverser traverser = description.traverse( rootNode );
+            for ( final Path path : traverser )
             {
-                continue;
-            }
-
-            final List<ProjectRelationship<?>> rels = convertToRelationships( path.relationships(), cache );
-            logger.debug( "traversing path: {}", rels );
-            for ( final ProjectRelationship<?> rel : rels )
-            {
-                logger.debug( "traverse: {}", rel );
-                if ( traversal.traverseEdge( rel, rels ) )
+                if ( path.lastRelationship() == null )
                 {
-                    logger.debug( "traversed: {}", rel );
-                    traversal.edgeTraversed( rel, rels );
+                    continue;
+                }
+
+                final List<ProjectRelationship<?, ?>> rels = convertToRelationships( path.relationships(), cache );
+                logger.debug( "traversing path: {}", rels );
+                for ( final ProjectRelationship<?, ?> rel : rels )
+                {
+                    logger.debug( "traverse: {}", rel );
+                    if ( traversal.traverseEdge( rel, rels ) )
+                    {
+                        logger.debug( "traversed: {}", rel );
+                        traversal.edgeTraversed( rel, rels );
+                    }
                 }
             }
+
+            tx.success();
+        }
+        finally
+        {
+            tx.finish();
         }
 
         traversal.endTraverse( graph );
@@ -918,7 +933,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public boolean containsRelationship( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean containsRelationship( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         checkClosed();
 
@@ -990,7 +1005,7 @@ public class FileNeo4JGraphConnection
         return node;
     }
 
-    protected Relationship getRelationship( final ProjectRelationship<?> rel )
+    protected Relationship getRelationship( final ProjectRelationship<?, ?> rel )
     {
         return getRelationship( id( rel ) );
     }
@@ -1246,6 +1261,7 @@ public class FileNeo4JGraphConnection
         description = description.expand( checker )
                                  .evaluator( checker );
 
+        Transaction tx = graph.beginTx();
         try
         {
             final Traverser traverser = description.traverse( start.toArray( new Node[start.size()] ) );
@@ -1255,10 +1271,12 @@ public class FileNeo4JGraphConnection
                 //            logger.info( "Aggregating path: {}", path );
                 // Don't need this, but we need to iterate the traverser.
             }
+            tx.success();
         }
         finally
         {
             visitor.traverseComplete( checker );
+            tx.finish();
         }
     }
 
@@ -1359,10 +1377,10 @@ public class FileNeo4JGraphConnection
         final Set<EProjectCycle> cycles = new HashSet<EProjectCycle>();
         for ( final CyclePath cyclicPath : cyclePaths )
         {
-            final List<ProjectRelationship<?>> cycle = new ArrayList<ProjectRelationship<?>>( cyclicPath.length() + 1 );
+            final List<ProjectRelationship<?, ?>> cycle = new ArrayList<ProjectRelationship<?, ?>>( cyclicPath.length() + 1 );
             for ( final long id : cyclicPath.getRelationshipIds() )
             {
-                ProjectRelationship<?> rel = cache.getRelationship( id );
+                ProjectRelationship<?, ?> rel = cache.getRelationship( id );
                 if ( rel == null )
                 {
                     final Relationship r = graph.getRelationshipById( id );
@@ -1379,7 +1397,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public boolean isCycleParticipant( final ViewParams params, final ProjectRelationship<?> rel )
+    public boolean isCycleParticipant( final ViewParams params, final ProjectRelationship<?, ?> rel )
     {
         for ( final EProjectCycle cycle : getCycles( params ) )
         {
@@ -1522,7 +1540,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public ExecutionResult executeFrom( final String cypher, final ProjectRelationship<?> rootRel )
+    public ExecutionResult executeFrom( final String cypher, final ProjectRelationship<?, ?> rootRel )
         throws RelationshipGraphConnectionException
     {
         return executeFrom( cypher, null, rootRel );
@@ -1530,7 +1548,7 @@ public class FileNeo4JGraphConnection
 
     @Override
     public ExecutionResult executeFrom( final String cypher, final Map<String, Object> params,
-                                        final ProjectRelationship<?> rootRel )
+                                        final ProjectRelationship<?, ?> rootRel )
         throws RelationshipGraphConnectionException
     {
         if ( cypher.startsWith( "START" ) )
@@ -1704,7 +1722,7 @@ public class FileNeo4JGraphConnection
 
     @Deprecated
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsFrom( final ViewParams params,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( final ViewParams params,
                                                                    final ProjectVersionRef from,
                                                                    final boolean includeManagedInfo,
                                                                    final RelationshipType... types )
@@ -1713,7 +1731,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsFrom( final ViewParams params,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsFrom( final ViewParams params,
                                                                    final ProjectVersionRef from,
                                                                    final boolean includeManagedInfo,
                                                                    final boolean includeConcreteInfo,
@@ -1744,14 +1762,14 @@ public class FileNeo4JGraphConnection
 
         if ( relationships != null )
         {
-            final Set<ProjectRelationship<?>> result = new HashSet<ProjectRelationship<?>>();
+            final Set<ProjectRelationship<?, ?>> result = new HashSet<ProjectRelationship<?, ?>>();
 
             final ConversionCache cache = new ConversionCache();
             for ( final Relationship r : relationships )
             {
                 if ( TraversalUtils.acceptedInView( r, params, cache ) )
                 {
-                    final ProjectRelationship<?> rel = toProjectRelationship( r, cache );
+                    final ProjectRelationship<?, ?> rel = toProjectRelationship( r, cache );
                     if ( rel != null )
                     {
                         result.add( rel );
@@ -1766,7 +1784,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
                                                                  final boolean includeManagedInfo,
                                                                  final boolean includeConcreteInfo,
                                                                  final RelationshipType... types )
@@ -1809,13 +1827,13 @@ public class FileNeo4JGraphConnection
         final ConversionCache cache = new ConversionCache();
         if ( relationships != null )
         {
-            final Set<ProjectRelationship<?>> result = new HashSet<ProjectRelationship<?>>();
+            final Set<ProjectRelationship<?, ?>> result = new HashSet<ProjectRelationship<?, ?>>();
             for ( final Relationship r : relationships )
             {
                 logger.debug( "Examining relationship: {}", r );
                 if ( TraversalUtils.acceptedInView( r, params, cache ) )
                 {
-                    final ProjectRelationship<?> rel = toProjectRelationship( r, cache );
+                    final ProjectRelationship<?, ?> rel = toProjectRelationship( r, cache );
                     if ( rel != null )
                     {
                         result.add( rel );
@@ -1962,9 +1980,9 @@ public class FileNeo4JGraphConnection
         final ConversionCache cache = new ConversionCache();
 
         final Neo4jGraphPath gp = (Neo4jGraphPath) path;
-        final List<ProjectRelationship<?>> rels = convertToRelationships( gp, adminAccess, cache );
+        final List<ProjectRelationship<?, ?>> rels = convertToRelationships( gp, adminAccess, cache );
         final List<ProjectVersionRef> refs = new ArrayList<ProjectVersionRef>( rels.size() + 2 );
-        for ( final ProjectRelationship<?> rel : rels )
+        for ( final ProjectRelationship<?, ?> rel : rels )
         {
             if ( refs.isEmpty() )
             {
@@ -1989,7 +2007,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public GraphPath<?> createPath( final ProjectRelationship<?>... rels )
+    public GraphPath<?> createPath( final ProjectRelationship<?, ?>... rels )
     {
         if ( rels.length < 1 )
         {
@@ -2012,7 +2030,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public GraphPath<?> createPath( final GraphPath<?> parent, final ProjectRelationship<?> rel )
+    public GraphPath<?> createPath( final GraphPath<?> parent, final ProjectRelationship<?, ?> rel )
     {
         if ( parent != null && !( parent instanceof Neo4jGraphPath ) )
         {
@@ -2237,7 +2255,7 @@ public class FileNeo4JGraphConnection
         }
     }
 
-    private void updateCaches( final Map<Long, ProjectRelationship<?>> newRelationships )
+    private void updateCaches( final Map<Long, ProjectRelationship<?, ?>> newRelationships )
     {
         if ( newRelationships.isEmpty() )
         {
@@ -2433,7 +2451,7 @@ public class FileNeo4JGraphConnection
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
+    public Set<ProjectRelationship<?, ?>> getDirectRelationshipsTo( final ViewParams params, final ProjectVersionRef to,
                                                                  final boolean includeManagedInfo,
                                                                  final RelationshipType... types )
     {

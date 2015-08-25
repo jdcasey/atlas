@@ -55,7 +55,7 @@ public class ParentRelationshipTest
             new SimpleProjectVersionRef( "org.foo", "foobar-parent", VersionUtils.createSingleVersion( "1" ) );
 
         final URI source = testURI();
-        final ParentRelationship pr = new ParentRelationship( source, projectRef, parentRef );
+        final ParentRelationship pr = new SimpleParentRelationship( source, projectRef, parentRef );
         final ParentRelationship pr2 = (ParentRelationship) pr.cloneFor( project2Ref );
 
         assertThat( pr.getDeclaring(), equalTo( projectRef ) );

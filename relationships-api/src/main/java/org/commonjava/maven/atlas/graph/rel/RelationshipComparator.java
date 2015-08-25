@@ -20,7 +20,7 @@ import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_U
 import java.util.Comparator;
 
 public final class RelationshipComparator
-    implements Comparator<ProjectRelationship<?>>
+    implements Comparator<ProjectRelationship<?, ?>>
 {
 
     public static final RelationshipComparator INSTANCE = new RelationshipComparator();
@@ -30,7 +30,7 @@ public final class RelationshipComparator
     }
 
     @Override
-    public int compare( final ProjectRelationship<?> one, final ProjectRelationship<?> two )
+    public int compare( final ProjectRelationship<?, ?> one, final ProjectRelationship<?, ?> two )
     {
         if ( one.getType() == two.getType() )
         {

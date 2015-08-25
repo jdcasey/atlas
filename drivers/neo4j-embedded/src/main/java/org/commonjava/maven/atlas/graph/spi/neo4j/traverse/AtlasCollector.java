@@ -33,6 +33,7 @@ import org.commonjava.maven.atlas.graph.spi.neo4j.GraphRelType;
 import org.commonjava.maven.atlas.graph.spi.neo4j.io.ConversionCache;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.CyclePath;
 import org.commonjava.maven.atlas.graph.spi.neo4j.model.Neo4jGraphPath;
+import org.commonjava.maven.atlas.graph.spi.neo4j.model.NeoProjectVersionRef;
 import org.commonjava.maven.atlas.graph.spi.neo4j.update.CycleCacheUpdater;
 import org.commonjava.maven.atlas.ident.util.JoinString;
 import org.neo4j.graphdb.Direction;
@@ -186,9 +187,8 @@ public final class AtlasCollector<STATE>
                 childTypes = TraversalUtils.getGraphRelTypes( filter );
             }
 
-            logger.debug( "Getting relationships from node: {} ({}) with type in [{}] and direction: {} (path: {})",
-                          path.endNode(), path.endNode()
-                                              .getProperty( GAV ), new JoinString( ", ", childTypes ), direction, path );
+            logger.debug( "Getting relationships from node: {} with type in [{}] and direction: {} (path: {})",
+                          path.endNode(), new JoinString( ", ", childTypes ), direction, path );
 
             final Iterable<Relationship> relationships = path.endNode()
                                                              .getRelationships( direction, childTypes );
@@ -236,7 +236,7 @@ public final class AtlasCollector<STATE>
                     logger.debug( "After selection, using child relationship: {}", r );
                 }
 
-                final ProjectRelationship<?> rel = toProjectRelationship( r, cache );
+                final ProjectRelationship<?, ?> rel = toProjectRelationship( r, cache );
 
                 final Neo4jGraphPath nextPath = new Neo4jGraphPath( graphPath, r );
                 final GraphPathInfo nextPathInfo = pathInfo.getChildPathInfo( rel );

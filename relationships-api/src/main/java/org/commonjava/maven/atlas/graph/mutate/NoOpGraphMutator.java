@@ -33,14 +33,14 @@ public class NoOpGraphMutator
     }
 
     @Override
-    public ProjectRelationship<?> selectFor( final ProjectRelationship<?> rel, final GraphPath<?> path,
+    public ProjectRelationship<?, ?> selectFor( final ProjectRelationship<?, ?> rel, final GraphPath<?> path,
                                              final RelationshipGraphConnection connection, final ViewParams params )
     {
         return rel;
     }
 
     @Override
-    public GraphMutator getMutatorFor( final ProjectRelationship<?> rel, final RelationshipGraphConnection connection,
+    public GraphMutator getMutatorFor( final ProjectRelationship<?, ?> rel, final RelationshipGraphConnection connection,
                                        final ViewParams params )
     {
         return this;

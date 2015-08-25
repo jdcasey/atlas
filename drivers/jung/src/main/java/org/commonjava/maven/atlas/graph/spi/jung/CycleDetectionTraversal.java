@@ -33,9 +33,9 @@ final class CycleDetectionTraversal
 {
     private final List<EProjectCycle> cycles = new ArrayList<EProjectCycle>();
 
-    private final ProjectRelationship<?> rel;
+    private final ProjectRelationship<?, ?> rel;
 
-    CycleDetectionTraversal( final ProjectRelationship<?> rel )
+    CycleDetectionTraversal( final ProjectRelationship<?, ?> rel )
     {
         this.rel = rel;
     }
@@ -46,7 +46,7 @@ final class CycleDetectionTraversal
     }
 
     @Override
-    public boolean preCheck( final ProjectRelationship<?> relationship, final List<ProjectRelationship<?>> path )
+    public boolean preCheck( final ProjectRelationship<?, ?> relationship, final List<ProjectRelationship<?, ?>> path )
     {
         if ( rel.getDeclaring()
                 .equals( rel.getTarget()
@@ -63,7 +63,7 @@ final class CycleDetectionTraversal
         if ( from.equals( relationship.getTarget()
                                       .asProjectVersionRef() ) )
         {
-            final List<ProjectRelationship<?>> cycle = new ArrayList<ProjectRelationship<?>>( path );
+            final List<ProjectRelationship<?, ?>> cycle = new ArrayList<ProjectRelationship<?, ?>>( path );
             cycle.add( rel );
 
             cycles.add( new EProjectCycle( cycle ) );

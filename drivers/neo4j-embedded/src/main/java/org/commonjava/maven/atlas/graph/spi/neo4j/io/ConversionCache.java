@@ -28,25 +28,25 @@ import java.util.Map;
 public class ConversionCache
 {
 
-    private Map<Long, WeakReference<ProjectRelationship<?>>> relationships;
+    private Map<Long, WeakReference<ProjectRelationship<?, ?>>> relationships;
 
     private Map<Long, WeakReference<ProjectVersionRef>> gavs;
 
     private Map<String, WeakReference<Object>> serializedObjects;
 
-    public ProjectRelationship<?> getRelationship( final Relationship rel )
+    public ProjectRelationship<?, ?> getRelationship( final Relationship rel )
     {
         return getRelationship( rel.getId() );
     }
 
-    public ProjectRelationship<?> getRelationship( final long rid )
+    public ProjectRelationship<?, ?> getRelationship( final long rid )
     {
         if ( relationships == null )
         {
             return null;
         }
 
-        final WeakReference<ProjectRelationship<?>> reference = relationships.get( rid );
+        final WeakReference<ProjectRelationship<?, ?>> reference = relationships.get( rid );
         if ( reference == null )
         {
             return null;
@@ -55,14 +55,14 @@ public class ConversionCache
         return reference.get();
     }
 
-    public void cache( final Relationship rel, final ProjectRelationship<?> r )
+    public void cache( final Relationship rel, final ProjectRelationship<?, ?> r )
     {
         if ( relationships == null )
         {
-            relationships = new HashMap<Long, WeakReference<ProjectRelationship<?>>>();
+            relationships = new HashMap<Long, WeakReference<ProjectRelationship<?, ?>>>();
         }
 
-        relationships.put( rel.getId(), new WeakReference<ProjectRelationship<?>>( r ) );
+        relationships.put( rel.getId(), new WeakReference<ProjectRelationship<?, ?>>( r ) );
     }
 
     public ProjectVersionRef getProjectVersionRef( final Node node )

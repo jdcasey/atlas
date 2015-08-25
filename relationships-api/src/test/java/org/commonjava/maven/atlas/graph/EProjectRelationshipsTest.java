@@ -23,11 +23,7 @@ import java.net.URISyntaxException;
 import java.util.Set;
 
 import org.commonjava.maven.atlas.graph.model.EProjectDirectRelationships;
-import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
@@ -59,26 +55,26 @@ public class EProjectRelationshipsTest
         final EProjectDirectRelationships.Builder prb = new EProjectDirectRelationships.Builder( source, p );
 
         final ProjectVersionRef parent = new SimpleProjectVersionRef( "org.apache.maven", "maven", "3.0.3" );
-        final ParentRelationship parentRel = new ParentRelationship( source, p, parent );
+        final ParentRelationship parentRel = new SimpleParentRelationship( source, p, parent );
 
         int idx = 0;
         int pidx = 0;
         final DependencyRelationship papi =
-            new DependencyRelationship( source, p, new SimpleArtifactRef( "org.apache.maven", "maven-plugin-api", "3.0.3",
+            new SimpleDependencyRelationship( source, p, new SimpleArtifactRef( "org.apache.maven", "maven-plugin-api", "3.0.3",
                                                                     null, null, false ), DependencyScope.compile,
                                         idx++, false );
         final DependencyRelationship art =
-            new DependencyRelationship( source, p, new SimpleArtifactRef( "org.apache.maven", "maven-artifact", "3.0.3",
+            new SimpleDependencyRelationship( source, p, new SimpleArtifactRef( "org.apache.maven", "maven-artifact", "3.0.3",
                                                                     null, null, false ), DependencyScope.compile,
                                         idx++, false );
         final PluginRelationship jarp =
-            new PluginRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.plugins", "maven-jar-plugin",
+            new SimplePluginRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.plugins", "maven-jar-plugin",
                                                                       "2.2" ), pidx++, false );
         final PluginRelationship comp =
-            new PluginRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.plugins",
+            new SimplePluginRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.plugins",
                                                                       "maven-compiler-plugin", "2.3.2" ), pidx++, false );
         final ExtensionRelationship wag =
-            new ExtensionRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.wagon",
+            new SimpleExtensionRelationship( source, p, new SimpleProjectVersionRef( "org.apache.maven.wagon",
                                                                          "wagon-provider-webdav", "1.0" ), 0 );
 
         prb.withParent( parentRel );
@@ -88,7 +84,7 @@ public class EProjectRelationshipsTest
 
         final EProjectDirectRelationships rels = prb.build();
 
-        final Set<ProjectRelationship<?>> all = rels.getAllRelationships();
+        final Set<ProjectRelationship<?, ?>> all = rels.getAllRelationships();
 
         assertThat( all.size(), equalTo( 6 ) );
 

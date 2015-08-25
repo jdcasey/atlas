@@ -29,19 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.commonjava.maven.atlas.graph.rel.BomRelationship;
-import org.commonjava.maven.atlas.graph.rel.DependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.ExtensionRelationship;
-import org.commonjava.maven.atlas.graph.rel.ParentRelationship;
-import org.commonjava.maven.atlas.graph.rel.PluginDependencyRelationship;
-import org.commonjava.maven.atlas.graph.rel.PluginRelationship;
-import org.commonjava.maven.atlas.graph.rel.ProjectRelationship;
+import org.commonjava.maven.atlas.graph.rel.*;
 import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.DependencyScope;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 
 public class EProjectDirectRelationships
     implements EProjectRelationshipCollection, Serializable
@@ -141,7 +134,7 @@ public class EProjectDirectRelationships
 
     public final List<PluginDependencyRelationship> getPluginDependencies( final ProjectVersionRef plugin, final boolean managed )
     {
-        final PluginRelationship pr = new PluginRelationship( source, getProjectRef(), plugin, 0, managed );
+        final PluginRelationship pr = new SimplePluginRelationship( source, getProjectRef(), plugin, 0, managed );
         return pluginDependencies.get( pr );
     }
 
@@ -151,18 +144,18 @@ public class EProjectDirectRelationships
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getAllRelationships()
+    public Set<ProjectRelationship<?, ?>> getAllRelationships()
     {
-        final Set<ProjectRelationship<?>> rels = getExactAllRelationships();
+        final Set<ProjectRelationship<?, ?>> rels = getExactAllRelationships();
         filterTerminalParents( rels );
 
         return rels;
     }
 
     @Override
-    public Set<ProjectRelationship<?>> getExactAllRelationships()
+    public Set<ProjectRelationship<?, ?>> getExactAllRelationships()
     {
-        final Set<ProjectRelationship<?>> result = new HashSet<ProjectRelationship<?>>();
+        final Set<ProjectRelationship<?, ?>> result = new HashSet<ProjectRelationship<?, ?>>();
         if ( parent != null )
         {
             result.add( parent );
@@ -216,7 +209,7 @@ public class EProjectDirectRelationships
         {
             if ( parent == null )
             {
-                parent = new ParentRelationship( source, ref );
+                parent = new SimpleParentRelationship( ref );
             }
 
             return new EProjectDirectRelationships( source, ref, parent, boms, dependencies, plugins,
@@ -226,7 +219,7 @@ public class EProjectDirectRelationships
 
         public Builder withParent( final ProjectVersionRef parent )
         {
-            this.parent = new ParentRelationship( source, ref, parent );
+            this.parent = new SimpleParentRelationship( source, ref, parent );
             return this;
         }
 
@@ -238,7 +231,7 @@ public class EProjectDirectRelationships
         }
 
         @SuppressWarnings( "unchecked" )
-        private <C extends ProjectRelationship<?>> C adjustDeclaring( final C rel )
+        private <C extends ProjectRelationship<?, ?>> C adjustDeclaring( final C rel )
         {
             if ( !ref
                      .equals( rel.getDeclaring() ) )
@@ -399,10 +392,10 @@ public class EProjectDirectRelationships
             return this;
         }
 
-        public Builder withRelationships( final Collection<ProjectRelationship<?>> relationships )
+        public Builder withRelationships( final Collection<ProjectRelationship<?, ?>> relationships )
         {
             final Set<PluginDependencyRelationship> pluginDepRels = new HashSet<PluginDependencyRelationship>();
-            for ( ProjectRelationship<?> rel : relationships )
+            for ( ProjectRelationship<?, ?> rel : relationships )
             {
                 rel = adjustDeclaring( rel );
                 switch ( rel.getType() )
@@ -456,7 +449,7 @@ public class EProjectDirectRelationships
         public int getNextPluginDependencyIndex( final ProjectVersionRef plugin, final boolean managed )
         {
             final List<PluginDependencyRelationship> list =
-                pluginDependencies.get( new PluginRelationship( source, ref, plugin, 0, managed ) );
+                pluginDependencies.get( new SimplePluginRelationship( source, ref, plugin, 0, managed ) );
             return list == null ? 0 : list.size();
         }
 
@@ -473,7 +466,7 @@ public class EProjectDirectRelationships
         public Builder withDependency( final ProjectVersionRef ref, final String type, final String classifier, final DependencyScope scope,
                                        final boolean managed )
         {
-            withDependencies( new DependencyRelationship( source, ref, new SimpleArtifactRef( ref, type, classifier, false ),
+            withDependencies( new SimpleDependencyRelationship( source, ref, new SimpleArtifactRef( ref, type, classifier, false ),
                                                           scope,
                                                           getNextDependencyIndex( managed ), managed ) );
 
@@ -482,14 +475,14 @@ public class EProjectDirectRelationships
 
         public Builder withPlugin( final ProjectVersionRef ref, final boolean managed )
         {
-            withPlugins( new PluginRelationship( source, ref, ref, getNextPluginIndex( managed ), managed ) );
+            withPlugins( new SimplePluginRelationship( source, ref, ref, getNextPluginIndex( managed ), managed ) );
 
             return this;
         }
 
         public Builder withExtension( final ProjectVersionRef ref )
         {
-            withExtensions( new ExtensionRelationship( source, RelationshipUtils.POM_ROOT_URI, ref, ref,
+            withExtensions( new SimpleExtensionRelationship( source, RelationshipUtils.POM_ROOT_URI, ref, ref,
                                                        getNextExtensionIndex() ) );
             return this;
         }
