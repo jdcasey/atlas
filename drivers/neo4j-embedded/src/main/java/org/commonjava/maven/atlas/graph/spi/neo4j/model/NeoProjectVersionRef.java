@@ -93,6 +93,11 @@ public class NeoProjectVersionRef
             this.versionString = ref.getVersionStringRaw();
             this.versionSpec = ref.getVersionSpecRaw();
         }
+        else if ( ref instanceof NeoProjectVersionRef )
+        {
+            this.versionString = ((NeoProjectVersionRef)ref).versionString;
+            this.versionSpec = ((NeoProjectVersionRef)ref).versionSpec;
+        }
     }
 
     public static ProjectVersionRef parse( final String gav )
@@ -109,11 +114,14 @@ public class NeoProjectVersionRef
     }
 
     @Override
-    public NeoProjectVersionRef asProjectVersionRef()
+    public ProjectVersionRef asProjectVersionRef()
     {
+        Logger logger = LoggerFactory.getLogger( getClass() );
+        logger.debug("Trying to create new ProjectVersionRef from: {}", getClass().getSimpleName());
+
         return NeoProjectVersionRef.class.equals( getClass() ) ?
                 this :
-                new NeoProjectVersionRef( getGroupId(), getArtifactId(), getVersionSpecRaw(), getVersionStringRaw() );
+                new NeoProjectVersionRef( this );
     }
 
     @Override

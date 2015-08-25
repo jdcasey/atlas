@@ -38,10 +38,8 @@ public class NeoProjectRef
 
     private static final long serialVersionUID = 1L;
 
-    // NEVER null
     private String groupId;
 
-    // NEVER null
     private String artifactId;
 
     protected PropertyContainer container;
@@ -54,7 +52,12 @@ public class NeoProjectRef
     {
         if ( ref instanceof NeoProjectRef)
         {
-            container = ((NeoProjectRef)ref).container;
+            NeoProjectRef npr = (NeoProjectRef) ref;
+            container = npr.container;
+            this.groupId = npr.groupId;
+            this.artifactId = npr.artifactId;
+            this.groupIdProperty = npr.groupIdProperty;
+            this.artifactIdProperty = npr.artifactIdProperty;
         }
         else
         {
@@ -65,14 +68,14 @@ public class NeoProjectRef
 
     public NeoProjectRef( final String groupId, final String artifactId )
     {
-        if ( isEmpty( groupId ) || isEmpty( artifactId ) )
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+
+        if ( isEmpty( getGroupId() ) || isEmpty( getArtifactId() ) )
         {
             throw new InvalidRefException( "ProjectId must contain non-empty groupId AND artifactId. (Given: '"
                 + groupId + "':'" + artifactId + "')" );
         }
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
     }
 
     public NeoProjectRef( Node container )
