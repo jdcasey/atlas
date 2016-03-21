@@ -22,9 +22,14 @@ import org.commonjava.maven.atlas.ident.ref.SimpleProjectVersionRef;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
+import static org.commonjava.maven.atlas.graph.rel.RelationshipConstants.POM_ROOT_URI;
 
 public abstract class AbstractSimpleProjectRelationship<R extends ProjectRelationship<R, T>, T extends ProjectVersionRef>
     implements ProjectRelationship<R, T>, Serializable

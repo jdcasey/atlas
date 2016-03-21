@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.commonjava.maven.atlas.graph.util;
+package org.commonjava.maven.atlas.graph.rel;
 
-import static org.commonjava.maven.atlas.ident.util.IdentityUtils.artifact;
-import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
+import org.commonjava.maven.atlas.ident.DependencyScope;
+import org.commonjava.maven.atlas.ident.ref.ProjectRef;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.util.JoinString;
+import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,72 +35,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.commonjava.maven.atlas.graph.filter.AbstractAggregatingFilter;
-import org.commonjava.maven.atlas.graph.filter.AbstractTypedFilter;
-import org.commonjava.maven.atlas.graph.filter.AnyFilter;
-import org.commonjava.maven.atlas.graph.filter.ProjectRelationshipFilter;
-import org.commonjava.maven.atlas.graph.rel.*;
-import org.commonjava.maven.atlas.ident.DependencyScope;
-import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.util.JoinString;
-import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.commonjava.maven.atlas.ident.util.IdentityUtils.artifact;
+import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
 
 public final class RelationshipUtils
 {
 
     private RelationshipUtils()
     {
-    }
-
-    public static final URI UNKNOWN_SOURCE_URI;
-
-    public static final URI POM_ROOT_URI;
-
-    public static URI ANY_SOURCE_URI;
-
-    public static URI TERMINAL_PARENT_SOURCE_URI;
-
-    static
-    {
-        final String uri = "atlas:terminal-parent";
-        try
-        {
-            TERMINAL_PARENT_SOURCE_URI = new URI( uri );
-        }
-        catch ( final URISyntaxException e )
-        {
-            throw new IllegalStateException( "Terminal-parent source URI constant is invalid: " + uri, e );
-        }
-
-        try
-        {
-            ANY_SOURCE_URI = new URI( "any:any" );
-        }
-        catch ( final URISyntaxException e )
-        {
-            throw new IllegalStateException( "Cannot construct any-source URI: 'any:any'" );
-        }
-
-        try
-        {
-            UNKNOWN_SOURCE_URI = new URI( "unknown:unknown" );
-        }
-        catch ( final URISyntaxException e )
-        {
-            throw new IllegalStateException( "Cannot construct unknown-source URI: 'unknown:unknown'" );
-        }
-
-        try
-        {
-            POM_ROOT_URI = new URI( "pom:root" );
-        }
-        catch ( final URISyntaxException e )
-        {
-            throw new IllegalStateException( "Cannot construct pom-root URI: 'pom:root'" );
-        }
     }
 
     public static boolean isExcluded( final ProjectRef ref, final Collection<ProjectRef> excludes )
@@ -151,7 +98,7 @@ public final class RelationshipUtils
         if ( profile == null || profile.trim()
                                        .length() < 1 )
         {
-            return POM_ROOT_URI;
+            return RelationshipConstants.POM_ROOT_URI;
         }
 
         try
@@ -193,28 +140,6 @@ public final class RelationshipUtils
         {
             final ProjectRelationship<?, ?> rel = iterator.next();
             if ( Arrays.binarySearch( types, rel.getType() ) < 0 )
-            {
-                iterator.remove();
-            }
-        }
-    }
-
-    public static void filter( final Set<? extends ProjectRelationship<?, ?>> rels, final ProjectRelationshipFilter filter )
-    {
-        if ( filter == null || filter instanceof AnyFilter )
-        {
-            return;
-        }
-
-        if ( rels == null || rels.isEmpty() )
-        {
-            return;
-        }
-
-        for ( final Iterator<? extends ProjectRelationship<?, ?>> iterator = rels.iterator(); iterator.hasNext(); )
-        {
-            final ProjectRelationship<?, ?> rel = iterator.next();
-            if ( !filter.accept( rel ) )
             {
                 iterator.remove();
             }
@@ -506,38 +431,6 @@ public final class RelationshipUtils
         throws InvalidVersionSpecificationException
     {
         return new SimpleDependencyRelationship( source, pomLocation, owner, artifact( dep, type, classifier ), scope, index, managed, inherited, optional );
-    }
-
-    public static Set<RelationshipType> getRelationshipTypes( final ProjectRelationshipFilter filter )
-    {
-        if ( filter == null )
-        {
-            return new HashSet<RelationshipType>( Arrays.asList( RelationshipType.values() ) );
-        }
-
-        final Set<RelationshipType> result = new HashSet<RelationshipType>();
-
-        if ( filter instanceof AbstractTypedFilter )
-        {
-            final AbstractTypedFilter typedFilter = (AbstractTypedFilter) filter;
-            result.addAll( typedFilter.getRelationshipTypes() );
-            result.addAll( typedFilter.getDescendantRelationshipTypes() );
-        }
-        else if ( filter instanceof AbstractAggregatingFilter )
-        {
-            final List<? extends ProjectRelationshipFilter> filters = ( (AbstractAggregatingFilter) filter ).getFilters();
-
-            for ( final ProjectRelationshipFilter f : filters )
-            {
-                result.addAll( getRelationshipTypes( f ) );
-            }
-        }
-        else
-        {
-            result.addAll( Arrays.asList( RelationshipType.values() ) );
-        }
-
-        return result;
     }
 
 }

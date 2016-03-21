@@ -15,14 +15,14 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.POM_ROOT_URI;
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.dependency;
-import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.junit.Test;
+
+import static org.commonjava.maven.atlas.graph.rel.RelationshipConstants.POM_ROOT_URI;
+import static org.commonjava.maven.atlas.graph.rel.RelationshipUtils.dependency;
+import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 public class RelationshipComparatorTest
 {

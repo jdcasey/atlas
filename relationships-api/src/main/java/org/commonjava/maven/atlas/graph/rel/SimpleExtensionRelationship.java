@@ -15,7 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
@@ -50,14 +49,14 @@ public final class SimpleExtensionRelationship
                                         final ProjectVersionRef target, final int index,
                                         final boolean inherited )
     {
-        super( source, RelationshipUtils.POM_ROOT_URI, RelationshipType.EXTENSION, declaring, target, index, inherited, false );
+        super( source, RelationshipConstants.POM_ROOT_URI, RelationshipType.EXTENSION, declaring, target, index, inherited, false );
     }
 
     public SimpleExtensionRelationship( final Collection<URI> sources, final ProjectVersionRef declaring,
                                         final ProjectVersionRef target, final int index,
                                         final boolean inherited )
     {
-        super( sources, RelationshipUtils.POM_ROOT_URI, RelationshipType.EXTENSION, declaring, target, index, inherited, false );
+        super( sources, RelationshipConstants.POM_ROOT_URI, RelationshipType.EXTENSION, declaring, target, index, inherited, false );
     }
 
     public SimpleExtensionRelationship( final ExtensionRelationship relationship )

@@ -15,10 +15,11 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import static org.commonjava.maven.atlas.graph.util.RelationshipUtils.dependency;
-import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
+import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,11 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
-import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import static org.commonjava.maven.atlas.graph.rel.RelationshipUtils.dependency;
+import static org.commonjava.maven.atlas.ident.util.IdentityUtils.projectVersion;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 public class RelationshipPathComparatorTest
 {

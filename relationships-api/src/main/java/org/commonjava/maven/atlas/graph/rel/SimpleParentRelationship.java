@@ -15,7 +15,6 @@
  */
 package org.commonjava.maven.atlas.graph.rel;
 
-import org.commonjava.maven.atlas.graph.util.RelationshipUtils;
 import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.atlas.ident.ref.SimpleArtifactRef;
@@ -38,7 +37,7 @@ public final class SimpleParentRelationship
      */
     public SimpleParentRelationship( final ProjectVersionRef declaring )
     {
-        super( RelationshipUtils.TERMINAL_PARENT_SOURCE_URI, RelationshipType.PARENT, declaring, declaring, 0, false, false );
+        super( RelationshipConstants.TERMINAL_PARENT_SOURCE_URI, RelationshipType.PARENT, declaring, declaring, 0, false, false );
     }
 
     /**
@@ -49,7 +48,7 @@ public final class SimpleParentRelationship
     @Deprecated
     public SimpleParentRelationship( final URI unused, final ProjectVersionRef declaring )
     {
-        super( RelationshipUtils.TERMINAL_PARENT_SOURCE_URI, RelationshipType.PARENT, declaring, declaring, 0, false, false );
+        super( RelationshipConstants.TERMINAL_PARENT_SOURCE_URI, RelationshipType.PARENT, declaring, declaring, 0, false, false );
     }
 
     public SimpleParentRelationship( final URI source, final ProjectVersionRef declaring,
